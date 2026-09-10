@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy: #0b1f3a;
+  --navy-deep: #071528;
+  --navy-mid: #143154;
+  --gold: #c5a572;
+  --gold-bright: #dbbf8a;
+  --emerald: #0a7a4b;
+  --crimson: #9e2a2b;
+  --charcoal: #1c1917;
+  --muted: #57534e;
+  --surface: #ffffff;
+  --canvas: #f8f7f4;
+  --line: rgba(11, 31, 58, 0.1);
+  --background: var(--canvas);
+  --foreground: var(--charcoal);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-navy-mid: var(--navy-mid);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-emerald: var(--emerald);
+  --color-crimson: var(--crimson);
+  --color-charcoal: var(--charcoal);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-canvas: var(--canvas);
+  --color-line: var(--line);
+  --font-sans: var(--font-roboto);
+  --font-display: var(--font-poppins);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--line);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--charcoal);
+  font-family: var(--font-roboto), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+.diplomatic-mesh {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(197, 165, 114, 0.18), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 10%, rgba(10, 122, 75, 0.14), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 70% 90%, rgba(158, 42, 43, 0.1), transparent 45%),
+    linear-gradient(160deg, #071528 0%, #0b1f3a 45%, #143154 100%);
+}
+
+.gold-rule {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold) 20%,
+    var(--gold-bright) 50%,
+    var(--gold) 80%,
+    transparent
+  );
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-pan {
+  0% {
+    transform: scale(1.05) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s ease-out both;
+}
+
+.animate-fade-up-delay {
+  animation: fade-up 0.9s ease-out 0.15s both;
+}
+
+.animate-soft-pan {
+  animation: soft-pan 18s ease-in-out infinite alternate;
 }
