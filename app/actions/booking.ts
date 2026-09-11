@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createBookingCalendarEvent } from "@/lib/booking/google-calendar";
 import { sendBookingEmails } from "@/lib/booking/email";
 import {
@@ -70,16 +71,20 @@ export async function submitBooking(
 
   try {
     const event = await createBookingCalendarEvent(booking);
-    await sendBookingEmails({
-      booking,
-      eventId: event.eventId,
-      htmlLink: event.htmlLink,
-    });
+    await saveBookingRecord({ ...booking, eventId: event.eventId });
+
     try {
-      await saveBookingRecord({ ...booking, eventId: event.eventId });
-    } catch (persistError) {
-      console.error("[booking:record]", persistError);
+      await sendBookingEmails({
+        booking,
+        eventId: event.eventId,
+        htmlLink: event.htmlLink,
+      });
+    } catch (emailError) {
+      console.error("[booking:email]", emailError);
     }
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/appointments");
 
     return {
       ok: true,
@@ -98,6 +103,28 @@ export async function submitBooking(
       return {
         ok: false,
         error: `${message}. Add Google Calendar and Resend keys to your environment.`,
+      };
+    }
+
+    const lower = message.toLowerCase();
+    if (
+      lower.includes("calendar api has not been used") ||
+      lower.includes("accessnotconfigured") ||
+      (lower.includes("calendar-json.googleapis.com") &&
+        lower.includes("disabled"))
+    ) {
+      return {
+        ok: false,
+        error:
+          "Booking calendar is temporarily unavailable. Please try again in a few minutes, or contact the Embassy if the problem continues.",
+      };
+    }
+
+    if (lower.includes("unable to persist") || lower.includes("blob")) {
+      return {
+        ok: false,
+        error:
+          "Your appointment could not be saved for staff review. Please try again or contact the Embassy.",
       };
     }
 

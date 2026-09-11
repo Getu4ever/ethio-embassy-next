@@ -1,54 +1,87 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { PRELOADER_STORAGE_KEY } from "@/lib/preloader";
 
-const STORAGE_KEY = "ethio-embassy-preloader-seen";
 const LOGO_SRC = "/legacy-site/images/logo-uk-modified.png";
+const DURATION_MS = 1600;
+const EXIT_MS = 550;
+
+function shouldSkipPreloader(pathname: string): boolean {
+  if (pathname.startsWith("/admin") || pathname.startsWith("/staff")) {
+    return true;
+  }
+  if (typeof document !== "undefined") {
+    if (document.documentElement.classList.contains("preloader-skip")) {
+      return true;
+    }
+  }
+  try {
+    return sessionStorage.getItem(PRELOADER_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export default function SitePreloader() {
   const pathname = usePathname();
-  const [visible, setVisible] = useState(false);
+  // Start visible so the first HTML paint covers the homepage (no post-hydration flash).
+  const [visible, setVisible] = useState(true);
   const [exiting, setExiting] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    if (pathname.startsWith("/admin")) return;
-
-    try {
-      if (sessionStorage.getItem(STORAGE_KEY) === "1") return;
-    } catch {
-      // private mode — still show once this mount
+  useLayoutEffect(() => {
+    if (shouldSkipPreloader(pathname)) {
+      document.documentElement.classList.remove("preloader-pending");
+      document.documentElement.classList.add("preloader-skip");
+      setVisible(false);
+      return;
     }
 
-    setVisible(true);
-    const start = performance.now();
-    const duration = 1600;
+    document.documentElement.classList.add("preloader-pending");
+    document.documentElement.classList.remove("preloader-skip");
 
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const duration = reduceMotion ? 400 : DURATION_MS;
+    const start = performance.now();
     let frame = 0;
+    let exitTimer = 0;
+
+    const finish = () => {
+      setExiting(true);
+      exitTimer = window.setTimeout(() => {
+        document.documentElement.classList.remove("preloader-pending");
+        document.documentElement.classList.add("preloader-skip");
+        setVisible(false);
+        try {
+          sessionStorage.setItem(PRELOADER_STORAGE_KEY, "1");
+        } catch {
+          /* ignore */
+        }
+      }, reduceMotion ? 0 : EXIT_MS);
+    };
+
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - t, 3);
       setProgress(Math.round(eased * 100));
       if (t < 1) {
         frame = requestAnimationFrame(tick);
       } else {
-        setExiting(true);
-        window.setTimeout(() => {
-          setVisible(false);
-          try {
-            sessionStorage.setItem(STORAGE_KEY, "1");
-          } catch {
-            /* ignore */
-          }
-        }, 550);
+        finish();
       }
     };
 
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(exitTimer);
+    };
   }, [pathname]);
 
   if (!visible) return null;

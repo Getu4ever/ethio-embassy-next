@@ -1,7 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { list, put } from "@vercel/blob";
 import type { BookingRequest } from "@/lib/booking/types";
+import { listCalendarBookingRecords } from "@/lib/booking/google-calendar";
+import { readOpsJson, writeOpsJson } from "@/lib/ops/json-store";
 
 export type BookingRecord = {
   id: string;
@@ -12,52 +11,78 @@ export type BookingRecord = {
   applicantName: string;
   applicantEmail: string;
   eventId?: string;
+  source?: "store" | "calendar";
 };
 
-const LOCAL_FILE = path.join(process.cwd(), ".data", "bookings.json");
 const BLOB_KEY = "ops/bookings.json";
 const MAX = 1000;
 
-function useBlob(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim());
+function sortRecords(records: BookingRecord[]): BookingRecord[] {
+  return [...records].sort((a, b) => {
+    const byDate = b.date.localeCompare(a.date);
+    if (byDate !== 0) return byDate;
+    return b.timeSlot.localeCompare(a.timeSlot);
+  });
 }
 
-async function readAll(): Promise<BookingRecord[]> {
-  if (useBlob()) {
-    const { blobs } = await list({ prefix: BLOB_KEY });
-    const match = blobs.find((b) => b.pathname === BLOB_KEY);
-    if (!match) return [];
-    const res = await fetch(match.url, { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = (await res.json()) as BookingRecord[];
-    return Array.isArray(data) ? data : [];
+function mergeRecords(
+  stored: BookingRecord[],
+  fromCalendar: BookingRecord[],
+): BookingRecord[] {
+  const byEvent = new Map<string, BookingRecord>();
+  const withoutEvent: BookingRecord[] = [];
+
+  for (const row of stored) {
+    if (row.eventId) {
+      byEvent.set(row.eventId, { ...row, source: "store" });
+    } else {
+      withoutEvent.push({ ...row, source: "store" });
+    }
   }
-  try {
-    const raw = await readFile(LOCAL_FILE, "utf8");
-    const data = JSON.parse(raw) as BookingRecord[];
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
+
+  for (const row of fromCalendar) {
+    if (!row.eventId) continue;
+    const existing = byEvent.get(row.eventId);
+    if (existing) {
+      byEvent.set(row.eventId, {
+        ...row,
+        ...existing,
+        eventId: row.eventId,
+        source: "store",
+      });
+    } else {
+      byEvent.set(row.eventId, { ...row, source: "calendar" });
+    }
   }
+
+  return sortRecords([...byEvent.values(), ...withoutEvent]);
 }
 
-async function writeAll(records: BookingRecord[]): Promise<void> {
-  const payload = JSON.stringify(records.slice(0, MAX), null, 2);
-  if (useBlob()) {
-    await put(BLOB_KEY, payload, {
-      access: "public",
-      contentType: "application/json",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-    });
-    return;
-  }
-  await mkdir(path.dirname(LOCAL_FILE), { recursive: true });
-  await writeFile(LOCAL_FILE, payload, "utf8");
+export async function listStoredBookingRecords(): Promise<BookingRecord[]> {
+  const data = await readOpsJson<BookingRecord[]>(BLOB_KEY, []);
+  return Array.isArray(data) ? data : [];
 }
 
 export async function listBookingRecords(): Promise<BookingRecord[]> {
-  return readAll();
+  return listStoredBookingRecords();
+}
+
+/** Merge durable store + Google Calendar so admin always sees every booking. */
+export async function listBookingsForRange(
+  from: string,
+  to: string,
+): Promise<BookingRecord[]> {
+  const [stored, calendar] = await Promise.all([
+    listStoredBookingRecords(),
+    listCalendarBookingRecords(from, to).catch((error) => {
+      console.error("[bookings:calendar]", error);
+      return [] as BookingRecord[];
+    }),
+  ]);
+
+  return mergeRecords(stored, calendar).filter(
+    (b) => b.date >= from && b.date <= to,
+  );
 }
 
 export async function saveBookingRecord(
@@ -72,10 +97,15 @@ export async function saveBookingRecord(
     applicantName: input.applicant.fullName,
     applicantEmail: input.applicant.email,
     eventId: input.eventId,
+    source: "store",
   };
-  const all = await readAll();
-  all.unshift(record);
-  await writeAll(all);
+  const all = await listStoredBookingRecords();
+  // Avoid duplicates if the same event is persisted twice.
+  const next = [
+    record,
+    ...all.filter((row) => !(record.eventId && row.eventId === record.eventId)),
+  ].slice(0, MAX);
+  await writeOpsJson(BLOB_KEY, next);
   return record;
 }
 
@@ -83,10 +113,9 @@ export async function countBookingsByDate(
   from: string,
   to: string,
 ): Promise<Record<string, number>> {
-  const all = await readAll();
+  const all = await listBookingsForRange(from, to);
   const counts: Record<string, number> = {};
   for (const row of all) {
-    if (row.date < from || row.date > to) continue;
     counts[row.date] = (counts[row.date] ?? 0) + 1;
   }
   return counts;

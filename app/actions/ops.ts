@@ -10,7 +10,7 @@ import {
   listHolidays,
   removeHoliday,
 } from "@/lib/ops/holidays";
-import { countBookingsByDate, listBookingRecords } from "@/lib/ops/bookings";
+import { countBookingsByDate, listBookingsForRange } from "@/lib/ops/bookings";
 import type { AppointmentDayDensity, EmbassyHoliday } from "@/lib/ops/types";
 import { getStaffUsername, isStaffAuthenticated } from "@/lib/staff/auth";
 
@@ -90,7 +90,11 @@ export async function staffAppointmentDensity(input: {
   year: number;
   month: number; // 1-12
 }): Promise<
-  | { ok: true; days: AppointmentDayDensity[]; bookings: Awaited<ReturnType<typeof listBookingRecords>> }
+  | {
+      ok: true;
+      days: AppointmentDayDensity[];
+      bookings: Awaited<ReturnType<typeof listBookingsForRange>>;
+    }
   | { ok: false; error: string }
 > {
   if (!(await isStaffAuthenticated())) {
@@ -106,7 +110,7 @@ export async function staffAppointmentDensity(input: {
   const [counts, holidays, bookings] = await Promise.all([
     countBookingsByDate(from, to),
     listHolidays(),
-    listBookingRecords(),
+    listBookingsForRange(from, to),
   ]);
   const holidayMap = new Map(holidays.map((h) => [h.date, h.label]));
 
@@ -125,6 +129,6 @@ export async function staffAppointmentDensity(input: {
   return {
     ok: true,
     days,
-    bookings: bookings.filter((b) => b.date >= from && b.date <= to),
+    bookings,
   };
 }

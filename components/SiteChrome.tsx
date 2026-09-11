@@ -10,14 +10,18 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
   const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
 
   if (isAdmin) {
-    return <div className="min-h-full">{children}</div>;
+    return (
+      <div className="min-h-full" data-site-chrome>
+        {children}
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="flex min-h-full flex-1 flex-col" data-site-chrome>
       <Navbar />
       <div className="flex-1">{children}</div>
       <Footer />
-    </>
+    </div>
   );
 }

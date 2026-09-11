@@ -4,7 +4,15 @@ import {
   BOOKING_SERVICE_LABELS,
   BOOKING_TIMEZONE,
   type BookingRequest,
+  type BookingServiceId,
 } from "@/lib/booking/types";
+import type { BookingRecord } from "@/lib/ops/bookings";
+
+const LABEL_TO_SERVICE = Object.fromEntries(
+  (Object.entries(BOOKING_SERVICE_LABELS) as [BookingServiceId, string][]).map(
+    ([id, label]) => [label, id],
+  ),
+) as Record<string, BookingServiceId>;
 
 function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -126,6 +134,14 @@ export async function createBookingCalendarEvent(input: BookingRequest) {
         dateTime: `${input.date}T${endTime}:00`,
         timeZone: BOOKING_TIMEZONE,
       },
+      extendedProperties: {
+        private: {
+          embassyBooking: "1",
+          service: input.service,
+          applicantEmail: input.applicant.email,
+          applicantName: input.applicant.fullName,
+        },
+      },
       reminders: {
         useDefault: false,
         overrides: [
@@ -142,4 +158,134 @@ export async function createBookingCalendarEvent(input: BookingRequest) {
     startsAt: timeMin,
     endsAt: timeMax,
   };
+}
+
+function parseDescriptionField(description: string, label: string): string {
+  const match = description.match(new RegExp(`^${label}:\\s*(.+)$`, "im"));
+  return match?.[1]?.trim() ?? "";
+}
+
+function eventToBookingRecord(
+  event: {
+    id?: string | null;
+    summary?: string | null;
+    description?: string | null;
+    created?: string | null;
+    start?: { dateTime?: string | null; date?: string | null } | null;
+    extendedProperties?: { private?: Record<string, string> | null } | null;
+  },
+): BookingRecord | null {
+  if (!event.id || event.start?.dateTime == null) return null;
+
+  const privateProps = event.extendedProperties?.private ?? {};
+  const start = new Date(event.start.dateTime);
+  if (Number.isNaN(start.getTime())) return null;
+
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: BOOKING_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(start);
+  const get = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  const date = `${get("year")}-${get("month")}-${get("day")}`;
+  const timeSlot = `${get("hour")}:${get("minute")}`;
+
+  let service = privateProps.service as BookingServiceId | undefined;
+  let applicantName = privateProps.applicantName ?? "";
+  let applicantEmail = privateProps.applicantEmail ?? "";
+
+  if (!service || !applicantName) {
+    const summary = event.summary ?? "";
+    const split = summary.split(" — ");
+    if (split.length >= 2) {
+      const maybeService = LABEL_TO_SERVICE[split[0]?.trim() ?? ""];
+      if (maybeService) service = maybeService;
+      if (!applicantName) applicantName = split.slice(1).join(" — ").trim();
+    }
+  }
+
+  const description = event.description ?? "";
+  if (!applicantEmail) {
+    applicantEmail = parseDescriptionField(description, "Email");
+  }
+  if (!applicantName) {
+    applicantName = parseDescriptionField(description, "Applicant") || "Applicant";
+  }
+  if (!service) {
+    const serviceLine = parseDescriptionField(description, "Service");
+    service = LABEL_TO_SERVICE[serviceLine] ?? "visa";
+  }
+
+  // Prefer tagged embassy bookings; still include summary-shaped appointments.
+  const isTagged = privateProps.embassyBooking === "1";
+  const looksLikeBooking =
+    isTagged ||
+    Boolean(LABEL_TO_SERVICE[(event.summary ?? "").split(" — ")[0]?.trim() ?? ""]);
+  if (!looksLikeBooking) return null;
+
+  return {
+    id: `CAL-${event.id}`,
+    createdAt: event.created ?? start.toISOString(),
+    service,
+    date,
+    timeSlot,
+    applicantName,
+    applicantEmail,
+    eventId: event.id,
+    source: "calendar",
+  };
+}
+
+/** List embassy booking events from Google Calendar for an inclusive date range. */
+export async function listCalendarBookingRecords(
+  from: string,
+  to: string,
+): Promise<BookingRecord[]> {
+  if (
+    !process.env.GOOGLE_CALENDAR_ID?.trim() ||
+    !process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim() ||
+    !process.env.GOOGLE_PRIVATE_KEY?.trim()
+  ) {
+    return [];
+  }
+
+  const calendarId = requireEnv("GOOGLE_CALENDAR_ID");
+  const calendar = getCalendarClient();
+  const timeMin = londonWallTimeToIso(from, "00:00");
+  const timeMax = londonWallTimeToIso(to, "23:59");
+
+  const items: Array<{
+    id?: string | null;
+    status?: string | null;
+    summary?: string | null;
+    description?: string | null;
+    created?: string | null;
+    start?: { dateTime?: string | null; date?: string | null } | null;
+    extendedProperties?: { private?: Record<string, string> | null } | null;
+  }> = [];
+  let pageToken: string | undefined;
+
+  do {
+    const res = await calendar.events.list({
+      calendarId,
+      timeMin,
+      timeMax,
+      singleEvents: true,
+      orderBy: "startTime",
+      maxResults: 250,
+      pageToken,
+    });
+    items.push(...(res.data.items ?? []));
+    pageToken = res.data.nextPageToken ?? undefined;
+  } while (pageToken);
+
+  return items
+    .filter((event) => event.status !== "cancelled")
+    .map((event) => eventToBookingRecord(event))
+    .filter((row): row is BookingRecord => Boolean(row));
 }

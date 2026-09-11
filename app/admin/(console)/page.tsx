@@ -3,19 +3,37 @@ import Link from "next/link";
 import { listCases } from "@/lib/cases/store";
 import { CASE_STATUS_LABELS, type CaseStatus } from "@/lib/cases/types";
 import { WORKFLOW_LIST } from "@/lib/consular/workflows";
+import { listBookingsForRange } from "@/lib/ops/bookings";
+import { BOOKING_SERVICE_LABELS } from "@/lib/booking/types";
 import { STRIPE_FEES, formatFeeAmount } from "@/lib/stripe/fees";
 
 export const metadata: Metadata = {
   title: "Dashboard",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
-  const cases = await listCases();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const from = `${year}-${String(month).padStart(2, "0")}-01`;
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+  const [cases, monthBookings] = await Promise.all([
+    listCases(),
+    listBookingsForRange(from, to),
+  ]);
   const awaitingPayment = cases.filter((c) => c.status === "awaiting_payment").length;
   const inReview = cases.filter((c) => c.status === "in_review").length;
   const needsInfo = cases.filter((c) => c.status === "needs_info").length;
   const submitted = cases.filter((c) => c.status === "submitted").length;
   const recent = cases.slice(0, 6);
+  const today = now.toISOString().slice(0, 10);
+  const upcomingBookings = monthBookings.filter((b) => b.date >= today).slice(0, 6);
+  const recentBookings =
+    upcomingBookings.length > 0 ? upcomingBookings : monthBookings.slice(0, 6);
 
   const statusOrder: CaseStatus[] = [
     "awaiting_payment",
@@ -34,16 +52,34 @@ export default async function AdminDashboardPage() {
           Dashboard
         </h1>
         <p className="mt-2 text-sm text-muted">
-          Overview of consular document cases, fees, and staff tools.
+          Overview of consular document cases, appointments, fees, and staff
+          tools.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
           { label: "Total cases", value: cases.length, href: "/admin/cases" },
-          { label: "Awaiting payment", value: awaitingPayment, href: "/admin/cases?status=awaiting_payment" },
-          { label: "In review", value: inReview, href: "/admin/cases?status=in_review" },
-          { label: "Needs info", value: needsInfo, href: "/admin/cases?status=needs_info" },
+          {
+            label: "Awaiting payment",
+            value: awaitingPayment,
+            href: "/admin/cases?status=awaiting_payment",
+          },
+          {
+            label: "In review",
+            value: inReview,
+            href: "/admin/cases?status=in_review",
+          },
+          {
+            label: "Needs info",
+            value: needsInfo,
+            href: "/admin/cases?status=needs_info",
+          },
+          {
+            label: "Month bookings",
+            value: monthBookings.length,
+            href: `/admin/appointments?year=${year}&month=${month}`,
+          },
         ].map((card) => (
           <Link
             key={card.label}
@@ -80,7 +116,10 @@ export default async function AdminDashboardPage() {
           </div>
           <ul className="mt-5 divide-y divide-line">
             {recent.map((record) => (
-              <li key={record.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+              <li
+                key={record.id}
+                className="flex items-center justify-between gap-3 py-3 text-sm"
+              >
                 <div>
                   <Link
                     href={`/admin/cases/${record.id}`}
@@ -111,6 +150,42 @@ export default async function AdminDashboardPage() {
         </section>
 
         <section className="space-y-6 lg:col-span-2">
+          <div className="border border-navy/10 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-display text-xl font-semibold text-navy">
+                Appointments
+              </h2>
+              <Link
+                href="/admin/appointments"
+                className="text-xs font-semibold uppercase tracking-[0.12em] text-navy"
+              >
+                Open →
+              </Link>
+            </div>
+            <ul className="mt-4 divide-y divide-line text-sm">
+              {recentBookings.map((booking) => (
+                <li key={booking.id} className="py-3">
+                  <p className="font-medium text-navy">
+                    {booking.date} · {booking.timeSlot}
+                  </p>
+                  <p className="text-muted">
+                    {booking.applicantName} ·{" "}
+                    {BOOKING_SERVICE_LABELS[booking.service]}
+                  </p>
+                </li>
+              ))}
+              {recentBookings.length === 0 ? (
+                <li className="py-6 text-muted">
+                  No bookings this month yet. Public form:{" "}
+                  <Link href="/booking" className="text-navy underline">
+                    /booking
+                  </Link>
+                  .
+                </li>
+              ) : null}
+            </ul>
+          </div>
+
           <div className="border border-navy/10 bg-white p-6 shadow-sm">
             <h2 className="font-display text-xl font-semibold text-navy">
               Queue by status
@@ -143,7 +218,7 @@ export default async function AdminDashboardPage() {
               </li>
               <li>
                 <Link href="/admin/appointments" className="hover:text-gold">
-                  Appointment calendar guidance →
+                  Appointment calendar →
                 </Link>
               </li>
               <li>

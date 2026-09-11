@@ -259,7 +259,12 @@ export default function AppointmentOpsPanel({
                     {b.date} · {b.timeSlot}
                   </p>
                   <p className="text-muted">
-                    {b.applicantName} · {b.service}
+                    {b.applicantName}
+                    {b.applicantEmail ? ` · ${b.applicantEmail}` : ""}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {b.service}
+                    {b.eventId ? " · calendar synced" : ""}
                   </p>
                 </li>
               ))}

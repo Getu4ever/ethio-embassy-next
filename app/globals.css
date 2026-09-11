@@ -220,6 +220,19 @@ p {
   animation: carousel-caption-in 0.75s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
+/* Hide homepage until the first-visit preloader finishes (set before paint). */
+html.preloader-pending {
+  overflow: hidden;
+}
+
+html.preloader-pending [data-site-chrome] {
+  visibility: hidden;
+}
+
+html.preloader-skip .site-preloader {
+  display: none !important;
+}
+
 .site-preloader--exit {
   animation: preloader-exit 0.55s ease forwards;
   pointer-events: none;
