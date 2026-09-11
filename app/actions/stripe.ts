@@ -33,6 +33,12 @@ export async function createStripeCheckoutSession(
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: input.customerEmail,
+      // Embassy consular fees are collected by the mission as merchant of record.
+      // Managed Payments (Stripe MoR) is enabled by default on this account and
+      // requires digital-product tax codes — turn it off for these fee checkouts.
+      managed_payments: {
+        enabled: false,
+      },
       line_items: [
         {
           quantity: 1,

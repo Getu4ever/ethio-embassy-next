@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { recordStaffAudit } from "@/lib/audit/record";
 import {
   sendCaseStatusEmail,
   sendCaseSubmittedEmails,
@@ -163,9 +164,23 @@ export async function staffUpdateCaseStatus(input: {
     return { ok: false, error: "Unauthorized." };
   }
 
+  const allowed: CaseStatus[] = [
+    "submitted",
+    "awaiting_payment",
+    "in_review",
+    "needs_info",
+    "approved",
+    "rejected",
+    "completed",
+  ];
+  if (!allowed.includes(input.status)) {
+    return { ok: false, error: "Invalid status." };
+  }
+
   const record = await getCase(input.caseId);
   if (!record) return { ok: false, error: "Case not found." };
 
+  const previous = record.status;
   const now = new Date().toISOString();
   record.status = input.status;
   record.updatedAt = now;
@@ -176,9 +191,36 @@ export async function staffUpdateCaseStatus(input: {
       by: "staff",
       body: input.message.trim(),
     });
+  } else {
+    record.staffNotes.push({
+      id: `n-${Date.now()}`,
+      at: now,
+      by: "staff",
+      body: `Status changed from ${previous} to ${input.status}.`,
+    });
   }
 
   await saveCase(record);
+
+  const auditAction =
+    input.status === "approved"
+      ? ("case.approve" as const)
+      : input.status === "rejected"
+        ? ("case.reject" as const)
+        : input.status === "needs_info"
+          ? ("case.request_info" as const)
+          : ("case.status_update" as const);
+
+  await recordStaffAudit({
+    action: auditAction,
+    module: "cases",
+    summary: `${record.reference}: ${previous} → ${input.status}`,
+    targetId: record.id,
+    metadata: {
+      reference: record.reference,
+      status: input.status,
+    },
+  });
 
   try {
     await sendCaseStatusEmail(record, input.message?.trim());
@@ -189,9 +231,46 @@ export async function staffUpdateCaseStatus(input: {
   revalidatePath("/admin");
   revalidatePath("/admin/cases");
   revalidatePath(`/admin/cases/${record.id}`);
+  revalidatePath("/admin/audit");
   revalidatePath("/staff");
   revalidatePath(`/staff/cases/${record.id}`);
   return { ok: true };
+}
+
+export async function approveCase(
+  caseId: string,
+  message?: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  return staffUpdateCaseStatus({
+    caseId,
+    status: "approved",
+    message: message?.trim() || "Application approved by consular staff.",
+  });
+}
+
+export async function requestCaseInfo(
+  caseId: string,
+  message: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!message.trim()) {
+    return { ok: false, error: "Please include what information is needed." };
+  }
+  return staffUpdateCaseStatus({
+    caseId,
+    status: "needs_info",
+    message: message.trim(),
+  });
+}
+
+export async function rejectCase(
+  caseId: string,
+  message?: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  return staffUpdateCaseStatus({
+    caseId,
+    status: "rejected",
+    message: message?.trim() || "Application rejected by consular staff.",
+  });
 }
 
 export async function markCasePaidFromStripe(input: {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { submitBooking } from "@/app/actions/booking";
+import { getPublicClosedDates } from "@/app/actions/ops";
 import type { BookingServiceId } from "@/lib/booking/types";
 
 type TimeSlot = {
@@ -88,7 +89,22 @@ export default function BookingWizard() {
   const [details, setDetails] = useState<ApplicantDetails>(initialDetails);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [closedDates, setClosedDates] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+    getPublicClosedDates()
+      .then((dates) => {
+        if (!cancelled) setClosedDates(new Set(dates));
+      })
+      .catch(() => {
+        if (!cancelled) setClosedDates(new Set());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const days = useMemo(() => buildCalendarDays(monthAnchor), [monthAnchor]);
   const monthLabel = monthAnchor.toLocaleString("en-GB", {
@@ -243,7 +259,8 @@ export default function BookingWizard() {
                   const isWeekend = weekday === 0 || weekday === 6;
                   const today = formatISODate(new Date());
                   const isPast = iso < today;
-                  const disabled = !inMonth || isWeekend || isPast;
+                  const isClosed = closedDates.has(iso);
+                  const disabled = !inMonth || isWeekend || isPast || isClosed;
                   const active = selectedDate === iso;
                   return (
                     <button
@@ -260,7 +277,8 @@ export default function BookingWizard() {
                           : active
                             ? "bg-navy text-white"
                             : "hover:bg-canvas text-charcoal"
-                      }`}
+                      } ${isClosed && inMonth ? "bg-crimson/10" : ""}`}
+                      title={isClosed ? "Embassy closed" : undefined}
                     >
                       {day.getDate()}
                     </button>

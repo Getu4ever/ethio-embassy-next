@@ -8,6 +8,8 @@ import {
   type BookingResult,
   type BookingServiceId,
 } from "@/lib/booking/types";
+import { getClosedDateSet } from "@/lib/ops/holidays";
+import { saveBookingRecord } from "@/lib/ops/bookings";
 
 const SERVICES = new Set<BookingServiceId>([
   "visa",
@@ -21,7 +23,6 @@ function validateBooking(input: BookingRequest): string | null {
   if (!/^\d{2}:\d{2}$/.test(input.timeSlot)) return "Please select a valid time.";
 
   const day = new Date(`${input.date}T12:00:00Z`).getUTCDay();
-  // getUTCDay: 0 Sun … 6 Sat. London weekdays approx OK at noon UTC.
   if (day === 0 || day === 6) {
     return "Appointments are available Monday to Friday only.";
   }
@@ -45,6 +46,15 @@ export async function submitBooking(
     return { ok: false, error: validationError };
   }
 
+  const closed = await getClosedDateSet();
+  if (closed.has(input.date)) {
+    return {
+      ok: false,
+      error:
+        "The Embassy is closed on that date (holiday / non-working day). Please choose another day.",
+    };
+  }
+
   const booking: BookingRequest = {
     service: input.service,
     date: input.date,
@@ -65,6 +75,11 @@ export async function submitBooking(
       eventId: event.eventId,
       htmlLink: event.htmlLink,
     });
+    try {
+      await saveBookingRecord({ ...booking, eventId: event.eventId });
+    } catch (persistError) {
+      console.error("[booking:record]", persistError);
+    }
 
     return {
       ok: true,
@@ -79,7 +94,6 @@ export async function submitBooking(
         ? error.message
         : "Unable to complete booking. Please try again or contact the Embassy.";
 
-    // Surface missing-config clearly for local setup
     if (message.startsWith("Missing environment variable:")) {
       return {
         ok: false,

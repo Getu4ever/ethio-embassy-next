@@ -11,6 +11,7 @@ const NAV: { href: string; label: string; exact?: boolean }[] = [
   { href: "/admin/cases", label: "Case queue" },
   { href: "/admin/appointments", label: "Appointments" },
   { href: "/admin/fees", label: "Fee catalogue" },
+  { href: "/admin/audit", label: "Audit log" },
   { href: "/admin/staff", label: "Staff & access" },
 ];
 
