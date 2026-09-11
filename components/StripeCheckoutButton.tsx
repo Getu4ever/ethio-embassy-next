@@ -10,6 +10,8 @@ type StripeCheckoutButtonProps = {
   className?: string;
   successPath?: string;
   cancelPath?: string;
+  caseId?: string;
+  customerEmail?: string;
 };
 
 export default function StripeCheckoutButton({
@@ -18,6 +20,8 @@ export default function StripeCheckoutButton({
   className,
   successPath,
   cancelPath,
+  caseId,
+  customerEmail,
 }: StripeCheckoutButtonProps) {
   const fee = STRIPE_FEES[feeId];
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +34,8 @@ export default function StripeCheckoutButton({
         feeId,
         successPath,
         cancelPath,
+        caseId,
+        customerEmail,
       });
 
       if (!result.ok) {
@@ -68,6 +74,7 @@ export default function StripeCheckoutButton({
       <p className="text-xs text-muted">
         Secure checkout for {fee.label} — {(fee.amount / 100).toFixed(2)}{" "}
         {fee.currency.toUpperCase()}
+        {fee.placeholder ? " (placeholder amount)" : ""}
       </p>
       {error ? (
         <p className="text-xs text-crimson" role="alert">

@@ -46,7 +46,7 @@ const consularActions = [
 export function HomeTop() {
   return (
     <section className="bg-canvas">
-      <div className="mx-auto grid max-w-7xl gap-5 px-4 py-8 sm:px-6 lg:grid-cols-12 lg:gap-6 lg:px-8 lg:py-10">
+      <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-12 lg:gap-6 lg:px-8 lg:py-10">
         <div className="lg:col-span-8">
           <NewsCarousel />
         </div>
@@ -132,24 +132,24 @@ export function HomeTop() {
 
 export function ConsularActions() {
   return (
-    <section className="bg-canvas px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="bg-canvas px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {consularActions.map((action) => (
           <Link
             key={action.href}
             href={action.href}
-            className={`group relative border bg-surface p-6 shadow-[0_20px_50px_rgba(11,31,58,0.08)] transition duration-300 hover:bg-[#0B2545] ${action.accent}`}
+            className={`group relative border bg-surface p-5 shadow-[0_20px_50px_rgba(11,31,58,0.08)] transition duration-300 hover:bg-[#0B2545] sm:p-6 ${action.accent}`}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold transition group-hover:text-[#dbbf8a]">
               Consular
             </p>
-            <h2 className="mt-3 font-display text-xl font-semibold text-navy transition group-hover:text-white">
+            <h2 className="mt-3 font-display text-lg font-semibold text-navy transition group-hover:text-white sm:text-xl">
               {action.title}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted transition group-hover:text-white/70">
               {action.description}
             </p>
-            <span className="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-navy transition duration-300 group-hover:gap-3 group-hover:text-[#dbbf8a]">
+            <span className="mt-6 inline-flex min-h-11 items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-navy transition duration-300 group-hover:gap-3 group-hover:text-[#dbbf8a]">
               Explore
               <span aria-hidden>→</span>
             </span>
@@ -167,25 +167,25 @@ export function ConsularActions() {
 export function LeadershipSection() {
   return (
     <section className="bg-navy text-white">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">
             National Leadership
           </p>
-          <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="mt-4 font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
             Official ministerial statements &amp; leadership
           </h2>
         </div>
-        <div className="mt-14 grid gap-8 sm:grid-cols-3">
+        <div className="mt-10 grid gap-8 sm:mt-14 sm:grid-cols-3">
           {leadership.map((person) => (
             <article key={person.role} className="text-center">
-              <div className="relative mx-auto aspect-[4/5] max-w-xs overflow-hidden border border-gold/30 bg-navy-mid">
+              <div className="relative mx-auto aspect-[4/5] max-w-[16rem] overflow-hidden border border-gold/30 bg-navy-mid sm:max-w-xs">
                 <Image
                   src={person.image.src}
                   alt={person.image.alt}
                   fill
                   className="object-cover object-top"
-                  sizes="(max-width: 768px) 80vw, 25vw"
+                  sizes="(max-width: 640px) 70vw, (max-width: 768px) 40vw, 25vw"
                 />
               </div>
               <h3 className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
@@ -204,25 +204,25 @@ export function LeadershipSection() {
 
 export function NewsSection() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">
             Official News Stream
           </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-navy">
+          <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-navy sm:text-3xl">
             Latest from the Embassy
           </h2>
         </div>
-        <div className="max-w-md text-sm text-muted">
+        <div className="hidden max-w-md text-sm text-muted sm:line-clamp-2 md:block">
           {latestTicker.map((item) => item.title).join(" · ")}
         </div>
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-12">
+      <div className="mt-8 grid gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-12">
         <Link
           href={`/news/${newsItems[0].slug}`}
-          className="group relative min-h-[28rem] overflow-hidden bg-navy lg:col-span-7"
+          className="group relative min-h-[22rem] overflow-hidden bg-navy sm:min-h-[28rem] lg:col-span-7"
         >
           <Image
             src={newsItems[0].image.src}
@@ -232,25 +232,25 @@ export function NewsSection() {
             sizes="(max-width: 1024px) 100vw, 58vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy/40 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+          <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
               {newsItems[0].category} · {newsItems[0].dateLabel}
             </span>
-            <h3 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">
+            <h3 className="mt-3 font-display text-xl font-semibold text-white sm:text-2xl md:text-3xl">
               {newsItems[0].title}
             </h3>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75">
+            <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/75">
               {newsItems[0].excerpt}
             </p>
           </div>
         </Link>
 
-        <div className="flex flex-col gap-6 lg:col-span-5">
+        <div className="flex flex-col gap-4 sm:gap-6 lg:col-span-5">
           {newsItems.slice(1).map((item) => (
             <Link
               key={item.slug}
               href={`/news/${item.slug}`}
-              className="group grid grid-cols-[7rem_1fr] gap-4 border border-line bg-surface p-3 transition hover:border-gold/50 sm:grid-cols-[9rem_1fr]"
+              className="group grid grid-cols-[5.5rem_1fr] gap-3 border border-line bg-surface p-3 transition hover:border-gold/50 sm:grid-cols-[9rem_1fr] sm:gap-4"
             >
               <div className="relative aspect-square overflow-hidden bg-navy">
                 <Image
@@ -261,7 +261,7 @@ export function NewsSection() {
                   sizes="144px"
                 />
               </div>
-              <div className="flex flex-col justify-center pr-2">
+              <div className="flex min-w-0 flex-col justify-center pr-1 sm:pr-2">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
                   {item.category} · {item.dateLabel}
                 </span>
@@ -283,12 +283,12 @@ export function NewsSection() {
 export function ServicesAndHorn() {
   return (
     <section className="border-t border-line bg-surface">
-      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-12 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:gap-12 sm:px-6 sm:py-16 lg:grid-cols-12 lg:px-8 lg:py-20">
         <div className="lg:col-span-7">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">
             Operational Linkages
           </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-navy">
+          <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-navy sm:text-3xl">
             Government online services
           </h2>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
@@ -302,10 +302,10 @@ export function ServicesAndHorn() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-full items-center justify-between border border-line bg-canvas px-4 py-4 text-sm font-medium text-navy transition hover:border-emerald hover:text-emerald"
+                  className="flex min-h-12 h-full items-center justify-between gap-3 border border-line bg-canvas px-4 py-4 text-sm font-medium text-navy transition hover:border-emerald hover:text-emerald"
                 >
-                  <span>{link.label}</span>
-                  <span aria-hidden>↗</span>
+                  <span className="min-w-0 break-words">{link.label}</span>
+                  <span aria-hidden className="shrink-0">↗</span>
                 </a>
               </li>
             ))}
@@ -313,7 +313,7 @@ export function ServicesAndHorn() {
         </div>
 
         <div className="lg:col-span-5">
-          <div className="border border-line bg-canvas p-6">
+          <div className="border border-line bg-canvas p-5 sm:p-6">
             <h3 className="font-display text-xl font-semibold text-navy">
               A Week in the Horn
             </h3>

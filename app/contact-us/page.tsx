@@ -8,20 +8,20 @@ export const metadata: Metadata = {
 export default function ContactUsPage() {
   return (
     <main>
-      <section className="diplomatic-mesh px-4 py-14 text-white sm:px-6 lg:px-8">
+      <section className="diplomatic-mesh px-4 py-10 text-white sm:px-6 sm:py-14 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">
             Embassy of Ethiopia · London
           </p>
-          <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
             Contact Us
           </h1>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="border border-line bg-surface p-6 sm:p-8">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
+          <div className="border border-line bg-surface p-5 sm:p-8">
             <h2 className="font-display text-xl font-semibold text-navy">
               Contact Us
             </h2>
@@ -33,10 +33,10 @@ export default function ContactUsPage() {
               <li>
                 <span className="font-semibold text-navy">Tel.: </span>
                 <a href={`tel:${contact.phone}`} className="hover:text-emerald">
-                  {contact.phone}
+                  {contact.phoneDisplay}
                 </a>
               </li>
-              <li>
+              <li className="break-all">
                 <span className="font-semibold text-navy">Email: </span>
                 <a
                   href={`mailto:${contact.email}`}
@@ -48,7 +48,7 @@ export default function ContactUsPage() {
             </ul>
           </div>
 
-          <div className="border border-line bg-surface p-6 sm:p-8">
+          <div className="border border-line bg-surface p-5 sm:p-8">
             <h2 className="font-display text-xl font-semibold text-navy">
               Office Hour
             </h2>
@@ -71,11 +71,11 @@ export default function ContactUsPage() {
           </div>
         </div>
 
-        <div className="mt-6 overflow-hidden border border-line bg-surface">
+        <div className="mt-5 overflow-hidden border border-line bg-surface sm:mt-6">
           <iframe
             title={contact.address}
             src={contact.mapEmbedUrl}
-            className="h-80 w-full border-0"
+            className="h-64 w-full border-0 sm:h-80"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />

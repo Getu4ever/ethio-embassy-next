@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
+import HeaderSearch from "@/components/HeaderSearch";
 import { primaryNav, type NavItem } from "@/lib/content/navigation";
 
 const LOGO_SRC = "/legacy-site/images/logo-uk-modified.png";
@@ -155,7 +156,7 @@ function DesktopDropdown({
     >
       <button
         type="button"
-        className={`inline-flex h-full items-center gap-1.5 whitespace-nowrap px-2.5 text-[12px] font-semibold uppercase tracking-[0.04em] transition xl:px-3 ${
+        className={`inline-flex h-full items-center gap-1.5 whitespace-nowrap px-2.5 text-[12px] font-semibold uppercase tracking-[0.04em] transition-colors xl:px-3 ${
           scrolled
             ? "text-white/95 hover:text-[#dbbf8a]"
             : "text-white/95 hover:text-white"
@@ -214,6 +215,7 @@ export default function Navbar() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  const scrolledRef = useRef(false);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -221,7 +223,22 @@ export default function Navbar() {
   }, [pathname]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    // Hysteresis: compact only after scrolling further down, expand only near top.
+    // Prevents sticky-header height changes from flipping scrollY across one threshold.
+    const COMPACT_AT = 96;
+    const EXPAND_AT = 12;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const next =
+        scrolledRef.current
+          ? y > EXPAND_AT
+          : y >= COMPACT_AT;
+      if (next === scrolledRef.current) return;
+      scrolledRef.current = next;
+      setScrolled(next);
+    };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -266,61 +283,56 @@ export default function Navbar() {
   return (
     <header
       ref={headerRef}
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        scrolled
-          ? "shadow-[0_12px_40px_rgba(7,21,40,0.35)]"
-          : ""
+      className={`sticky top-0 z-50 w-full ${
+        scrolled ? "shadow-[0_12px_40px_rgba(7,21,40,0.35)]" : ""
       }`}
     >
       {/* Tier 1 — London banner with logo on the right */}
       <div
-        className={`relative w-full overflow-hidden transition-all duration-300 ${
-          scrolled ? "min-h-[3.75rem] sm:min-h-[4.25rem]" : "min-h-[6.5rem] sm:min-h-[7.5rem]"
+        className={`relative w-full overflow-hidden bg-[#0B2545] transition-[height] duration-200 ease-out ${
+          scrolled
+            ? "h-[4.75rem] sm:h-[5.25rem]"
+            : "h-[8rem] sm:h-[8.5rem]"
         }`}
       >
-        <Image
-          src="/images/london-england-banner.jpg"
-          alt=""
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
-        <div
-          className={`relative z-10 flex w-full items-center justify-end px-4 transition-all duration-300 sm:px-8 lg:px-12 ${
-            scrolled ? "py-2" : "py-4 sm:py-5"
-          }`}
-        >
-          <Link
-            href="/"
-            className="ml-auto shrink-0"
-            onClick={closeAll}
-          >
+        {/* Mobile uses a left-cropped banner so branding reads larger; desktop keeps full art */}
+        <div className="absolute inset-y-0 left-0 right-[5.75rem] overflow-hidden sm:inset-0 sm:right-0">
+          <Image
+            src="/images/london-england-banner-mobile.jpg"
+            alt=""
+            fill
+            priority
+            className="object-cover object-left sm:hidden"
+            sizes="(max-width: 639px) 100vw, 0px"
+          />
+          <Image
+            src="/images/london-england-banner.jpg"
+            alt=""
+            fill
+            priority
+            className="hidden object-cover object-center sm:block"
+            sizes="100vw"
+          />
+        </div>
+        <div className="relative z-10 flex h-full w-full items-center justify-end px-4 py-3 sm:px-8 sm:py-4 lg:px-12">
+          <Link href="/" className="ml-auto shrink-0" onClick={closeAll}>
             <span
-              className={`relative inline-flex items-center justify-center transition-all duration-300 ${
-                scrolled ? "p-[3px]" : "p-1 sm:p-1.5"
+              className={`relative inline-flex origin-right items-center justify-center p-1 transition-transform duration-200 ease-out will-change-transform sm:p-1.5 ${
+                scrolled ? "scale-[0.72]" : "scale-100"
               }`}
             >
               <span
                 className="absolute inset-0 rounded-full bg-gradient-to-br from-[#dbbf8a] via-[#c5a572] to-[#8a7048] shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
                 aria-hidden
               />
-              <span
-                className={`relative overflow-hidden rounded-full bg-[#0B2545] transition-all duration-300 ${
-                  scrolled ? "p-0.5" : "p-1"
-                }`}
-              >
+              <span className="relative overflow-hidden rounded-full bg-[#0B2545] p-1">
                 <Image
                   src={LOGO_SRC}
                   alt="Embassy of Ethiopia in London"
                   width={220}
                   height={220}
                   priority
-                  className={`h-auto object-contain transition-all duration-300 ${
-                    scrolled
-                      ? "w-11 sm:w-12"
-                      : "w-[5rem] sm:w-[5.5rem] md:w-24"
-                  }`}
+                  className="h-auto w-[5rem] object-contain sm:w-[5.5rem] md:w-24"
                 />
               </span>
             </span>
@@ -330,19 +342,19 @@ export default function Navbar() {
 
       {/* Tier 2 — menu row (scroll: deep teal glass, not white) */}
       <div
-        className={`transition-all duration-300 ${
+        className={
           scrolled
             ? "border-b border-white/10 bg-[#006699]/95 backdrop-blur-md"
             : "bg-[#0B2545]"
-        }`}
+        }
       >
-        <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
+        <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:h-16 sm:px-6">
           <nav className="hidden min-w-0 flex-1 lg:flex" aria-label="Primary">
             <ul className="flex w-full flex-nowrap items-center justify-center gap-0.5 xl:gap-1">
               <li>
                 <Link
                   href="/"
-                  className={`inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-2 text-[12px] font-semibold uppercase tracking-[0.04em] transition xl:px-3 ${
+                  className={`inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-2 text-[12px] font-semibold uppercase tracking-[0.04em] transition-colors xl:px-3 ${
                     pathname === "/"
                       ? "text-[#dbbf8a]"
                       : linkTone
@@ -370,7 +382,7 @@ export default function Navbar() {
                   <li key={item.label}>
                     <Link
                       href={item.href}
-                      className={`inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-2 text-[12px] font-semibold uppercase tracking-[0.04em] transition xl:px-3 ${
+                      className={`inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-2 text-[12px] font-semibold uppercase tracking-[0.04em] transition-colors xl:px-3 ${
                         isActive(pathname, item.href)
                           ? "text-[#dbbf8a]"
                           : linkTone
@@ -385,22 +397,23 @@ export default function Navbar() {
             </ul>
           </nav>
 
-          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3 lg:ml-3">
+          <div className="ml-auto flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-3 lg:ml-3">
+            <HeaderSearch scrolled={scrolled} />
             <Link
               href="/contact-us"
-              className="hidden whitespace-nowrap border border-white/30 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:border-[#dbbf8a] hover:text-[#dbbf8a] md:inline-flex"
+              className="hidden whitespace-nowrap border border-white/30 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-[#dbbf8a] hover:text-[#dbbf8a] md:inline-flex"
             >
               Contact
             </Link>
             <Link
               href="/booking"
-              className="inline-flex whitespace-nowrap bg-[#c5a572] px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#0B2545] transition hover:bg-[#dbbf8a] sm:px-4"
+              className="hidden whitespace-nowrap bg-[#c5a572] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#0B2545] transition-colors hover:bg-[#dbbf8a] lg:inline-flex"
             >
               Book Appointment
             </Link>
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center border border-white/25 text-white transition hover:border-[#dbbf8a] hover:text-[#dbbf8a] lg:hidden"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-white/25 text-white transition-colors hover:border-[#dbbf8a] hover:text-[#dbbf8a] lg:hidden"
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -433,11 +446,11 @@ export default function Navbar() {
             mobileOpen ? "block" : "hidden"
           } ${scrolled ? "bg-[#006699]" : "bg-[#0B2545]"}`}
         >
-          <ul className="mx-auto max-h-[min(70vh,32rem)] max-w-7xl space-y-0.5 overflow-y-auto px-4 py-3">
+          <ul className="mx-auto max-h-[min(70dvh,32rem)] max-w-7xl space-y-0.5 overflow-y-auto overscroll-contain px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-4">
             <li>
               <Link
                 href="/"
-                className="flex items-center gap-2 px-2 py-2.5 text-sm font-semibold uppercase tracking-wide text-white"
+                className="flex min-h-11 items-center gap-2 px-2 py-3 text-sm font-semibold uppercase tracking-wide text-white"
                 onClick={closeAll}
               >
                 <IconHome className="h-4 w-4" />
@@ -450,7 +463,7 @@ export default function Navbar() {
                   <>
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between gap-2 px-2 py-2.5 text-left text-sm font-semibold uppercase tracking-wide text-white"
+                      className="flex min-h-11 w-full items-center justify-between gap-2 px-2 py-3 text-left text-sm font-semibold uppercase tracking-wide text-white"
                       aria-expanded={openMenu === item.label}
                       onClick={() =>
                         setOpenMenu((c) =>
@@ -472,7 +485,7 @@ export default function Navbar() {
                           <li key={child.href}>
                             <Link
                               href={child.href}
-                              className="block py-2 text-sm text-white/75 hover:text-white"
+                              className="block min-h-11 py-3 text-sm text-white/75 hover:text-white"
                               onClick={closeAll}
                             >
                               {child.label}
@@ -485,7 +498,7 @@ export default function Navbar() {
                 ) : (
                   <Link
                     href={item.href}
-                    className="flex items-center gap-2 px-2 py-2.5 text-sm font-semibold uppercase tracking-wide text-white"
+                    className="flex min-h-11 items-center gap-2 px-2 py-3 text-sm font-semibold uppercase tracking-wide text-white"
                     onClick={closeAll}
                   >
                     {navIcon(item.label, "h-4 w-4 opacity-80")}
@@ -497,14 +510,14 @@ export default function Navbar() {
             <li className="grid gap-2 border-t border-white/10 pt-3 sm:grid-cols-2">
               <Link
                 href="/contact-us"
-                className="block border border-white/30 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.14em] text-white"
+                className="block border border-white/30 px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-[0.14em] text-white"
                 onClick={closeAll}
               >
                 Contact Us
               </Link>
               <Link
                 href="/booking"
-                className="block bg-[#c5a572] px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.14em] text-[#0B2545]"
+                className="block bg-[#c5a572] px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-[0.14em] text-[#0B2545]"
                 onClick={closeAll}
               >
                 Book Appointment

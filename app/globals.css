@@ -32,22 +32,82 @@
   --color-surface: var(--surface);
   --color-canvas: var(--canvas);
   --color-line: var(--line);
-  --font-sans: var(--font-roboto);
-  --font-display: var(--font-poppins);
+  --font-sans: var(--font-source);
+  --font-display: var(--font-cormorant);
 }
 
 * {
   border-color: var(--line);
 }
 
+html {
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background: var(--canvas);
   color: var(--charcoal);
-  font-family: var(--font-roboto), system-ui, sans-serif;
+  font-family: var(--font-source), var(--font-ethiopic), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  overflow-x: clip;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+img,
+video,
+iframe,
+svg {
+  max-width: 100%;
+}
+
+/* Comfortable tap targets on coarse pointers */
+@media (pointer: coarse) {
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 .font-display {
-  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+}
+
+.font-ethiopic,
+:lang(am) {
+  font-family: var(--font-ethiopic), "Noto Sans Ethiopic", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* Keep footer labels compact — never inherit display heading scale */
+footer h1,
+footer h2,
+footer h3,
+footer h4 {
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  font-family: var(--font-source), system-ui, sans-serif;
+}
+
+p {
+  font-family: var(--font-source), system-ui, sans-serif;
+  line-height: 1.75;
 }
 
 .diplomatic-mesh {
@@ -90,6 +150,52 @@ body {
   }
 }
 
+@keyframes kenburns {
+  0% {
+    transform: scale(1.08) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.18) translate3d(-2%, -1.5%, 0);
+  }
+}
+
+@keyframes carousel-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes carousel-caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes preloader-exit {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes preloader-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
 .animate-fade-up {
   animation: fade-up 0.8s ease-out both;
 }
@@ -100,4 +206,43 @@ body {
 
 .animate-soft-pan {
   animation: soft-pan 18s ease-in-out infinite alternate;
+}
+
+.carousel-kenburns {
+  animation: kenburns 7s ease-out both;
+}
+
+.carousel-progress {
+  animation: carousel-progress linear both;
+}
+
+.carousel-caption {
+  animation: carousel-caption-in 0.75s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.site-preloader--exit {
+  animation: preloader-exit 0.55s ease forwards;
+  pointer-events: none;
+}
+
+.site-preloader__mark {
+  animation: preloader-pulse 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-up-delay,
+  .animate-soft-pan,
+  .carousel-kenburns,
+  .carousel-progress,
+  .carousel-caption,
+  .site-preloader__mark {
+    animation: none !important;
+  }
+
+  .site-preloader--exit {
+    animation: none !important;
+    opacity: 0;
+    visibility: hidden;
+  }
 }

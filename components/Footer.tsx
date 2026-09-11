@@ -12,7 +12,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <p className="font-display text-2xl font-semibold tracking-tight text-white">
+            <p className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
               {site.name}
             </p>
             <p className="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-gold">
@@ -26,10 +26,10 @@ export default function Footer() {
               <p>{contact.address}</p>
               <p>
                 <a href={`tel:${contact.phone}`} className="transition hover:text-gold">
-                  Tel.: {contact.phone}
+                  Tel.: {contact.phoneDisplay}
                 </a>
               </p>
-              <p>
+              <p className="break-all">
                 <a
                   href={`mailto:${contact.email}`}
                   className="transition hover:text-gold"
@@ -42,7 +42,7 @@ export default function Footer() {
 
           <div className="grid gap-10 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-2">
             <div>
-              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+              <h2 className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
                 Government Online Services
               </h2>
               <ul className="space-y-2.5 text-sm text-white/75">
@@ -61,7 +61,7 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+              <h2 className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
                 Important Links
               </h2>
               <ul className="space-y-2.5 text-sm text-white/75">
@@ -82,7 +82,7 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-3">
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+            <h2 className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
               Office Hour
             </h2>
             <div className="border border-white/10 bg-white/5 p-5">

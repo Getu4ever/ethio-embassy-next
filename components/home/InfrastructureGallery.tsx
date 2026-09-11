@@ -29,6 +29,18 @@ const GALLERY = [
 
 export default function InfrastructureGallery() {
   const [index, setIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(1);
+
+  useEffect(() => {
+    const update = () => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setVisibleCount(3);
+      else if (window.matchMedia("(min-width: 640px)").matches) setVisibleCount(2);
+      else setVisibleCount(1);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -41,18 +53,19 @@ export default function InfrastructureGallery() {
     setIndex((current) => (current + dir + GALLERY.length) % GALLERY.length);
   };
 
-  // Show current + next two as a responsive card row (wraps on mobile)
-  const visible = [0, 1, 2].map((offset) => GALLERY[(index + offset) % GALLERY.length]);
+  const visible = Array.from({ length: visibleCount }, (_, offset) => {
+    return GALLERY[(index + offset) % GALLERY.length];
+  });
 
   return (
-    <section className="bg-canvas py-16 sm:py-20">
+    <section className="bg-canvas py-12 sm:py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#c5a572]">
               Gallery
             </p>
-            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-[#0B2545] sm:text-4xl">
+            <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-[#0B2545] sm:text-3xl md:text-4xl">
               Modern Ethiopia Infrastructure &amp; Heritage
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
@@ -65,7 +78,7 @@ export default function InfrastructureGallery() {
               type="button"
               aria-label="Previous gallery items"
               onClick={() => go(-1)}
-              className="flex h-10 w-10 items-center justify-center border border-slate-300 bg-white text-[#0B2545] transition hover:border-[#0B2545]"
+              className="flex h-11 w-11 items-center justify-center border border-slate-300 bg-white text-[#0B2545] transition hover:border-[#0B2545]"
             >
               ‹
             </button>
@@ -73,14 +86,14 @@ export default function InfrastructureGallery() {
               type="button"
               aria-label="Next gallery items"
               onClick={() => go(1)}
-              className="flex h-10 w-10 items-center justify-center border border-slate-300 bg-white text-[#0B2545] transition hover:border-[#0B2545]"
+              className="flex h-11 w-11 items-center justify-center border border-slate-300 bg-white text-[#0B2545] transition hover:border-[#0B2545]"
             >
               ›
             </button>
           </div>
         </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-5 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {visible.map((item) => (
             <article
               key={`${item.src}-${index}`}
@@ -92,10 +105,10 @@ export default function InfrastructureGallery() {
                   alt={item.title}
                   fill
                   className="object-cover transition duration-700 hover:scale-[1.03]"
-                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </div>
-              <div className="p-5">
+              <div className="p-4 sm:p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c5a572]">
                   {item.tag}
                 </p>
@@ -116,7 +129,7 @@ export default function InfrastructureGallery() {
               key={item.src}
               type="button"
               aria-label={`Go to gallery set ${i + 1}`}
-              className={`h-2 w-2 rounded-full transition ${
+              className={`h-2.5 w-2.5 rounded-full transition ${
                 i === index % GALLERY.length
                   ? "bg-[#0B2545]"
                   : "bg-slate-300 hover:bg-slate-400"

@@ -1,15 +1,19 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-
-type ServiceId = "visa" | "passport" | "legalization";
+import { submitBooking } from "@/app/actions/booking";
+import type { BookingServiceId } from "@/lib/booking/types";
 
 type TimeSlot = {
   id: string;
   label: string;
 };
 
-const SERVICES: { id: ServiceId; title: string; description: string }[] = [
+const SERVICES: {
+  id: BookingServiceId;
+  title: string;
+  description: string;
+}[] = [
   {
     id: "visa",
     title: "Visa Services",
@@ -66,12 +70,15 @@ function buildCalendarDays(anchor: Date): Date[] {
 }
 
 function formatISODate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 export default function BookingWizard() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [service, setService] = useState<ServiceId | null>(null);
+  const [service, setService] = useState<BookingServiceId | null>(null);
   const [monthAnchor, setMonthAnchor] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -80,6 +87,7 @@ export default function BookingWizard() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [details, setDetails] = useState<ApplicantDetails>(initialDetails);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const days = useMemo(() => buildCalendarDays(monthAnchor), [monthAnchor]);
@@ -96,16 +104,19 @@ export default function BookingWizard() {
     details.phone.trim().length > 5;
 
   const onSubmit = () => {
-    startTransition(() => {
-      // Structured for future database / calendar API persistence.
-      const bookingPayload = {
+    if (!service || !selectedDate || !selectedSlot) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await submitBooking({
         service,
         date: selectedDate,
         timeSlot: selectedSlot,
         applicant: details,
-        createdAt: new Date().toISOString(),
-      };
-      console.info("[booking:stub]", bookingPayload);
+      });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       setSubmitted(true);
     });
   };
@@ -117,11 +128,11 @@ export default function BookingWizard() {
           Request received
         </p>
         <h2 className="mt-3 font-display text-2xl font-semibold text-navy">
-          Your appointment request has been recorded
+          Your appointment is on the Embassy calendar
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-sm text-muted">
-          This is a client-side stub. Connect `bookingPayload` to your calendar
-          API or database to confirm slots and send confirmation emails.
+          A confirmation email has been sent to you, and the consular desk has
+          been notified. Please bring all required documents to your visit.
         </p>
       </div>
     );
@@ -129,15 +140,15 @@ export default function BookingWizard() {
 
   return (
     <div className="border border-line bg-surface shadow-[0_30px_80px_rgba(11,31,58,0.08)]">
-      <div className="border-b border-line px-6 py-5 sm:px-8">
-        <ol className="flex flex-wrap gap-4 text-xs font-semibold uppercase tracking-[0.16em]">
+      <div className="border-b border-line px-4 py-4 sm:px-8 sm:py-5">
+        <ol className="flex flex-wrap gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] sm:gap-4 sm:text-xs sm:tracking-[0.16em]">
           {(
             [
-              [1, "Select Service"],
-              [2, "Date & Time"],
-              [3, "Applicant Details"],
+              [1, "Service", "Select Service"],
+              [2, "Schedule", "Date & Time"],
+              [3, "Details", "Applicant Details"],
             ] as const
-          ).map(([n, label]) => (
+          ).map(([n, shortLabel, label]) => (
             <li
               key={n}
               className={
@@ -147,13 +158,14 @@ export default function BookingWizard() {
               <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-current text-[11px]">
                 {n}
               </span>
-              {label}
+              <span className="sm:hidden">{shortLabel}</span>
+              <span className="hidden sm:inline">{label}</span>
             </li>
           ))}
         </ol>
       </div>
 
-      <div className="p-6 sm:p-8">
+      <div className="p-4 sm:p-8">
         {step === 1 ? (
           <div className="grid gap-4 sm:grid-cols-3">
             {SERVICES.map((item) => (
@@ -229,7 +241,9 @@ export default function BookingWizard() {
                   const inMonth = day.getMonth() === monthAnchor.getMonth();
                   const weekday = day.getDay();
                   const isWeekend = weekday === 0 || weekday === 6;
-                  const disabled = !inMonth || isWeekend;
+                  const today = formatISODate(new Date());
+                  const isPast = iso < today;
+                  const disabled = !inMonth || isWeekend || isPast;
                   const active = selectedDate === iso;
                   return (
                     <button
@@ -324,14 +338,20 @@ export default function BookingWizard() {
             </label>
           </form>
         ) : null}
+
+        {error ? (
+          <p className="mt-4 text-sm text-crimson" role="alert">
+            {error}
+          </p>
+        ) : null}
       </div>
 
-      <div className="flex items-center justify-between border-t border-line px-6 py-4 sm:px-8">
+      <div className="flex flex-col-reverse items-stretch gap-3 border-t border-line px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <button
           type="button"
           disabled={step === 1 || isPending}
           onClick={() => setStep((s) => (s === 1 ? 1 : ((s - 1) as 1 | 2 | 3)))}
-          className="text-xs font-semibold uppercase tracking-[0.14em] text-muted disabled:opacity-30"
+          className="min-h-11 text-xs font-semibold uppercase tracking-[0.14em] text-muted disabled:opacity-30 sm:min-h-0"
         >
           Back
         </button>
@@ -343,7 +363,7 @@ export default function BookingWizard() {
               (step === 2 && !canContinueStep2)
             }
             onClick={() => setStep((s) => (s === 3 ? 3 : ((s + 1) as 1 | 2 | 3)))}
-            className="bg-navy px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-white disabled:opacity-40"
+            className="min-h-11 bg-navy px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-white disabled:opacity-40"
           >
             Continue
           </button>
@@ -352,7 +372,7 @@ export default function BookingWizard() {
             type="button"
             disabled={!canSubmit || isPending}
             onClick={onSubmit}
-            className="bg-gold px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-navy-deep disabled:opacity-40"
+            className="min-h-11 bg-gold px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-navy-deep disabled:opacity-40"
           >
             {isPending ? "Submitting…" : "Submit Request"}
           </button>

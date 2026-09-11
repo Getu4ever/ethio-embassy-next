@@ -5,15 +5,9 @@ import {
   type CreateCheckoutSessionInput,
   type CreateCheckoutSessionResult,
 } from "@/lib/stripe/fees";
+import { getStripe, siteOrigin } from "@/lib/stripe/client";
+import { getCase, saveCase } from "@/lib/cases/store";
 
-/**
- * Initializes a Stripe Checkout Session for a selected consular fee.
- *
- * Wire-up checklist:
- * 1. `npm install stripe`
- * 2. Set `STRIPE_SECRET_KEY` in the environment
- * 3. Replace the stub below with `stripe.checkout.sessions.create(...)`
- */
 export async function createStripeCheckoutSession(
   input: CreateCheckoutSessionInput,
 ): Promise<CreateCheckoutSessionResult> {
@@ -22,8 +16,8 @@ export async function createStripeCheckoutSession(
     return { ok: false, error: "Unknown fee selection." };
   }
 
-  const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret) {
+  const stripe = getStripe();
+  if (!stripe) {
     return {
       ok: false,
       error:
@@ -31,30 +25,55 @@ export async function createStripeCheckoutSession(
     };
   }
 
-  // Placeholder response shaped like a Checkout Session.
-  // Replace with the Stripe SDK when keys are available:
-  //
-  // const stripe = new Stripe(secret);
-  // const session = await stripe.checkout.sessions.create({
-  //   mode: "payment",
-  //   line_items: [{
-  //     quantity: 1,
-  //     price_data: {
-  //       currency: fee.currency,
-  //       unit_amount: fee.amount,
-  //       product_data: { name: fee.label, description: fee.description },
-  //     },
-  //   }],
-  //   success_url: `${origin}${input.successPath ?? "/booking?paid=1"}`,
-  //   cancel_url: `${origin}${input.cancelPath ?? "/booking?cancelled=1"}`,
-  //   metadata: { feeId: fee.id },
-  // });
-  // return { ok: true, url: session.url!, sessionId: session.id };
+  const origin = siteOrigin();
+  const successPath = input.successPath ?? "/apply?paid=1";
+  const cancelPath = input.cancelPath ?? "/apply?cancelled=1";
 
-  return {
-    ok: false,
-    error: `Stripe Checkout stub ready for “${fee.label}” (${(
-      fee.amount / 100
-    ).toFixed(2)} ${fee.currency.toUpperCase()}). Install the Stripe SDK to go live.`,
-  };
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      customer_email: input.customerEmail,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: fee.currency,
+            unit_amount: fee.amount,
+            product_data: {
+              name: fee.label,
+              description: fee.placeholder
+                ? `${fee.description} — placeholder amount pending Embassy confirmation.`
+                : fee.description,
+            },
+          },
+        },
+      ],
+      success_url: `${origin}${successPath}${successPath.includes("?") ? "&" : "?"}session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}${cancelPath}`,
+      metadata: {
+        feeId: fee.id,
+        caseId: input.caseId ?? "",
+        placeholder: fee.placeholder ? "1" : "0",
+      },
+    });
+
+    if (!session.url) {
+      return { ok: false, error: "Stripe did not return a checkout URL." };
+    }
+
+    if (input.caseId) {
+      const existing = await getCase(input.caseId);
+      if (existing) {
+        existing.stripeSessionId = session.id;
+        existing.updatedAt = new Date().toISOString();
+        await saveCase(existing);
+      }
+    }
+
+    return { ok: true, url: session.url, sessionId: session.id };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Stripe checkout failed.";
+    return { ok: false, error: message };
+  }
 }

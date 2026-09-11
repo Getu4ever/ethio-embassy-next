@@ -8,12 +8,13 @@ export type NavItem = NavLink & {
   children?: NavLink[];
 };
 
-/** Primary navbar — mirrors `#menu-main-menu` in legacy-site/index.html */
+/** Primary navbar */
 export const primaryNav: NavItem[] = [
   {
     label: "About Us",
-    href: "#",
+    href: "/about-us",
     children: [
+      { label: "About Us Overview", href: "/about-us" },
       { label: "The Embassy", href: "/the-embassy" },
       { label: "The Embassy Profile", href: "/the-embassy-profile" },
       { label: "The Ambassador", href: "/the-ambassador" },
@@ -22,8 +23,9 @@ export const primaryNav: NavItem[] = [
   },
   {
     label: "About Ethiopia",
-    href: "#",
+    href: "/about-ethiopia",
     children: [
+      { label: "About Ethiopia Overview", href: "/about-ethiopia" },
       { label: "Profile", href: "/profile" },
       { label: "History", href: "/history" },
       { label: "Government", href: "/government" },
@@ -35,8 +37,11 @@ export const primaryNav: NavItem[] = [
   },
   {
     label: "Consular Services",
-    href: "#",
+    href: "/consular-services",
     children: [
+      { label: "Consular Overview", href: "/consular-services" },
+      { label: "Book Appointment", href: "/booking" },
+      { label: "Submit Documents", href: "/apply" },
       { label: "Visa Services", href: "/visa-services" },
       { label: "Passport Services", href: "/passport-services" },
       {
@@ -53,10 +58,23 @@ export const primaryNav: NavItem[] = [
         href: "/criminal-record",
       },
       { label: "Duty-Free Notes", href: "/duty-free-notes" },
+      { label: "Shipping Human Remains", href: "/shipping-human-remains" },
+      { label: "Vital Events", href: "/vital-events" },
     ],
   },
   { label: "Diaspora", href: "/diaspora-policy" },
-  { label: "Investment", href: "/investment-overviews" },
+  {
+    label: "Investment",
+    href: "/investment-overviews",
+    children: [
+      { label: "Investment Overview", href: "/investment-overviews" },
+      { label: "Invest in Ethiopia", href: "/invest-in-ethiopia" },
+      { label: "Agriculture", href: "/agriculture" },
+      { label: "Textile & Garment", href: "/textiles" },
+      { label: "Leather Products", href: "/leather-and-leather-products" },
+      { label: "Mining", href: "/mining" },
+    ],
+  },
   { label: "GERD", href: "/gerd" },
   { label: "Contact Us", href: "/contact-us" },
 ];
