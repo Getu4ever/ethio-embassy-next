@@ -1,0 +1,29 @@
+# Embassy of Ethiopia in London
+
+> Official website of the Embassy of the Federal Democratic Republic of Ethiopia to the United Kingdom.
+
+This site provides consular services guidance, diplomatic news, and information about Ethiopia for visitors and the Ethiopian community in the UK.
+
+## Key pages
+
+- [Home](/): Mission overview, news, and service entry points
+- [Embassy News](/news): Official announcements and diplomatic updates
+- [Consular Services](/consular-services): Visas, passports, legalization, and related services
+- [Book Appointment](/booking): Online consular appointment booking
+- [Contact Us](/contact-us): Address, phone, email, and office hours
+- [The Ambassador](/the-ambassador): Head of Mission profile
+- [About Ethiopia](/about-ethiopia): Country profile, culture, economy, tourism
+- [Investment](/investment-overviews): Investment opportunities in Ethiopia
+- [Search](/search): Site search
+
+## Contact
+
+- Address: 17 Princes Gate, London SW7 1PZ
+- Phone: +44 20 7589 7212
+- Email: london.embassy@mfa.gov.et
+- X: https://x.com/ETEmbassyLDN
+
+## Optional
+
+- Full AI summary: /llms-full.txt
+- Sitemap: /sitemap.xml

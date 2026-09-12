@@ -1,4 +1,5 @@
 import CinematicHero from "@/components/home/CinematicHero";
+import HomeFaqSection from "@/components/home/HomeFaqSection";
 import InfrastructureGallery from "@/components/home/InfrastructureGallery";
 import {
   ConsularActions,
@@ -7,16 +8,20 @@ import {
   NewsSection,
   ServicesAndHorn,
 } from "@/components/home/HomeSections";
+import JsonLd from "@/components/JsonLd";
+import { faqPageJsonLd } from "@/lib/seo/structured-data";
 
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={faqPageJsonLd()} />
       <CinematicHero />
       <HomeTop />
       <ConsularActions />
       <LeadershipSection />
       <InfrastructureGallery />
       <NewsSection />
+      <HomeFaqSection />
       <ServicesAndHorn />
     </>
   );

@@ -1,0 +1,57 @@
+# Embassy of Ethiopia in London — full summary for AI systems
+
+Official website of the Embassy of the Federal Democratic Republic of Ethiopia to the United Kingdom (London mission).
+
+## Mission
+
+The Embassy represents Ethiopia in the UK, delivers consular services to Ethiopian nationals and visa applicants, and promotes bilateral relations, diaspora engagement, culture, tourism, and investment.
+
+## Location and hours
+
+- Address: 17 Princes Gate, London SW7 1PZ, United Kingdom
+- Office hours: Monday–Friday, 9:00AM–1:00PM and 2:00PM–5:00PM
+- Closed: Saturdays, Sundays, and public holidays
+- Phone: +44 20 7589 7212
+- Email: london.embassy@mfa.gov.et
+- Website: https://ethioembassy.org.uk
+
+## Consular services
+
+Applicants can find guidance and online booking for:
+
+- Visa services
+- Passport services
+- Ethiopian Origin ID Card (Yellow Card)
+- Authentication and legalization
+- Laissez-passer
+- Criminal record and TIN documentation
+- Duty-free notes
+- Shipping human remains
+- Vital events (birth, marriage, divorce, death)
+
+Key entry points: /consular-services, /booking, /apply
+
+## Content sections
+
+- About Us / The Embassy / The Ambassador / Photo Gallery
+- About Ethiopia: profile, history, government, culture, economy, tourism, diplomatic hub of Africa
+- Diaspora policy
+- Investment overviews and sector pages (agriculture, textiles, leather, mining)
+- GERD
+- Embassy News articles at /news
+
+## News
+
+The Embassy publishes official announcements and diplomatic engagement stories at /news, including consular notices and ambassadorial activities.
+
+## Search
+
+Site search is available at /search?q={query} and via the header search control.
+
+## Policies
+
+Cookie policy: /cookie-policy
+
+## Social
+
+Official updates on X: @ETEmbassyLDN (https://x.com/ETEmbassyLDN)

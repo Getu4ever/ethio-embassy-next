@@ -83,7 +83,7 @@ export const latestTicker: { title: string; href: string }[] = [
   },
   {
     title:
-      "Embassy Ethiopia has visited Kagool’s office in #Bermingham, #UK. An engaging panel discussion was held with Kagool team.",
+      "Embassy visits Kagool’s Birmingham office for investment dialogue",
     href: "/news/kagool-birmingham-visit",
   },
   {
@@ -113,15 +113,15 @@ export const newsItems: NewsItem[] = [
     date: "2026-07-13",
     dateLabel: "July 13, 2026",
     category: "Announcements",
-    image: assets.consularAd,
+    image: assets.consularAnnouncementHero,
     author: "Website Admin",
   },
   {
     slug: "kagool-birmingham-visit",
     title:
-      "Embassy Ethiopia has visited Kagool’s office in #Bermingham, #UK. An engaging panel discussion was held with Kagool team.",
+      "Embassy visits Kagool’s Birmingham office for investment dialogue",
     excerpt:
-      "Embassy Ethiopia has visited Kagool’s office in #Bermingham, #UK. An engaging panel discussion was held with Kagool team. Discussion focused on Kagool’s expansion roadmap for",
+      "An engaging panel discussion with Kagool focused on Ethiopia’s expansion roadmap, digital transformation, and Africa’s growing tech opportunity.",
     date: "2025-02-20",
     dateLabel: "February 20, 2025",
     category: "News",

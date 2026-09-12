@@ -104,6 +104,10 @@ export const governmentOnlineServices: NavLink[] = [
 
 export const importantLinks: NavLink[] = [
   {
+    label: "Embassy News",
+    href: "/news",
+  },
+  {
     label: "Office of the Prime Minister",
     href: "https://www.pmo.gov.et/",
     external: true,

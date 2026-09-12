@@ -5,9 +5,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { newsItems } from "@/lib/content/site";
 
-const slides = newsItems.filter(
-  (item) => item.slug !== "consular-announcement",
-);
+const PREFERRED_FIRST = "ambassador-credentials-imo";
+
+const slides = [
+  ...newsItems.filter((item) => item.slug === PREFERRED_FIRST),
+  ...newsItems.filter(
+    (item) =>
+      item.slug !== PREFERRED_FIRST && item.slug !== "consular-announcement",
+  ),
+];
 
 const INTERVAL_MS = 7000;
 

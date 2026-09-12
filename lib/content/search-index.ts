@@ -8,6 +8,12 @@ export type SearchEntry = {
 /** Static site index for header search */
 export const searchIndex: SearchEntry[] = [
   {
+    title: "Embassy News",
+    href: "/news",
+    description: "Official announcements and diplomatic updates from London",
+    keywords: ["news", "announcements", "articles", "posts"],
+  },
+  {
     title: "Home",
     href: "/",
     description: "Embassy of Ethiopia in London — homepage",

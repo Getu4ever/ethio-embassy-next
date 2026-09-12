@@ -72,8 +72,26 @@ export const assets = {
   consularAd: {
     src: "/images/Consular-Advertizment.jpg",
     width: 800,
-    height: 600,
+    height: 1131,
     alt: "Consular announcement — ማስታወቂያ",
+  },
+  consularAnnouncementHero: {
+    src: "/images/news/consular-announcement-hero.jpg",
+    width: 1376,
+    height: 768,
+    alt: "Consular services desk at the Embassy of Ethiopia in London",
+  },
+  newsIndexHero: {
+    src: "/images/news/news-index-hero.jpg",
+    width: 1376,
+    height: 768,
+    alt: "Diplomatic reading room at the Embassy of Ethiopia in London",
+  },
+  ogDefault: {
+    src: "/images/og-default.jpg",
+    width: 1200,
+    height: 630,
+    alt: "Embassy of Ethiopia in London",
   },
   newsScholars: {
     src: "/images/745524975_3207126539434264_6130311344526054697_n.jpeg",
