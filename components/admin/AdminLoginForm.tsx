@@ -59,6 +59,11 @@ export default function AdminLoginForm({ configured }: Props) {
         <h1 className="mt-2 font-display text-2xl font-semibold text-navy sm:text-[1.75rem]">
           Consular Admin
         </h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          Sign in with your staff email. Master Admin uses{" "}
+          <code className="text-navy">london.embassy@mfa.gov.et</code>. The
+          system does not send mail to that inbox.
+        </p>
       </div>
 
       <form action={action} className="mt-8 space-y-5">

@@ -7,6 +7,7 @@ import {
 import Script from "next/script";
 import SiteChrome from "@/components/SiteChrome";
 import SitePreloader from "@/components/SitePreloader";
+import { getResolvedOfficeHours } from "@/lib/cms/content-store";
 import { PRELOADER_STORAGE_KEY } from "@/lib/preloader";
 import { site } from "@/lib/content/site";
 import "./globals.css";
@@ -51,7 +52,20 @@ export const viewport: Viewport = {
   themeColor: "#0B2545",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  let officeHours = {
+    days: "Monday to Friday",
+    morning: "9:00AM – 1:00PM",
+    afternoon: "2:00PM – 5:00PM",
+    summary: "9:00 am – 5:00 pm",
+    closed: "Saturday & Sunday also Holidays — Closed",
+  };
+  try {
+    officeHours = await getResolvedOfficeHours();
+  } catch (error) {
+    console.error("[layout] office hours fallback", error);
+  }
+
   return (
     <html
       lang="en"
@@ -65,7 +79,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: preloaderBoot }}
         />
         <SitePreloader />
-        <SiteChrome>{children}</SiteChrome>
+        <SiteChrome officeHours={officeHours}>{children}</SiteChrome>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { appendAuditEntry } from "@/lib/audit/store";
 import type { AuditAction, AuditModule } from "@/lib/audit/types";
-import { getStaffUsername } from "@/lib/staff/auth";
+import { getSessionStaff } from "@/lib/staff/auth";
 
 export async function clientIpAddress(): Promise<string> {
   const h = await headers();
@@ -16,10 +16,17 @@ export async function recordStaffAudit(input: {
   summary: string;
   targetId?: string;
   metadata?: Record<string, string>;
+  username?: string;
 }): Promise<void> {
   try {
+    const session = await getSessionStaff();
+    const username =
+      input.username ||
+      session?.displayName ||
+      session?.email ||
+      "system";
     await appendAuditEntry({
-      username: getStaffUsername(),
+      username,
       action: input.action,
       module: input.module,
       summary: input.summary,

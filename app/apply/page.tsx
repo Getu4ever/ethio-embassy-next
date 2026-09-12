@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getResolvedFees } from "@/lib/cms/content-store";
 import { WORKFLOW_LIST } from "@/lib/consular/workflows";
-import { STRIPE_FEES, formatFeeAmount } from "@/lib/stripe/fees";
+import { formatFeeAmount } from "@/lib/stripe/fees";
 
 export const metadata: Metadata = {
   title: "Submit Consular Documents",
@@ -9,7 +10,11 @@ export const metadata: Metadata = {
     "Upload supporting documents for consular services at the Embassy of Ethiopia in London.",
 };
 
-export default function ApplyHubPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ApplyHubPage() {
+  const fees = await getResolvedFees();
+
   return (
     <main>
       <section className="diplomatic-mesh px-4 py-12 text-white sm:px-6 sm:py-16 lg:px-8">
@@ -30,7 +35,7 @@ export default function ApplyHubPage() {
       <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <ul className="grid gap-4 sm:grid-cols-2">
           {WORKFLOW_LIST.map((workflow) => {
-            const fee = workflow.feeId ? STRIPE_FEES[workflow.feeId] : null;
+            const fee = workflow.feeId ? fees[workflow.feeId] : null;
             return (
               <li key={workflow.id}>
                 <Link

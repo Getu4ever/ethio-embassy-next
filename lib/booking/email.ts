@@ -5,6 +5,8 @@ import {
   BOOKING_TIMEZONE,
   type BookingRequest,
 } from "@/lib/booking/types";
+import { contact } from "@/lib/content/site";
+import { resolveDeskNotifyEmail } from "@/lib/notify/safe-email";
 
 function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -21,7 +23,8 @@ export async function sendBookingEmails(input: {
 }) {
   const apiKey = requireEnv("RESEND_API_KEY");
   const from = requireEnv("BOOKING_FROM_EMAIL");
-  const notify = requireEnv("BOOKING_NOTIFY_EMAIL");
+  const notify = resolveDeskNotifyEmail();
+  const publicContact = contact.email;
   const resend = new Resend(apiKey);
 
   const serviceLabel = BOOKING_SERVICE_LABELS[input.booking.service];
@@ -48,20 +51,27 @@ export async function sendBookingEmails(input: {
     <p><strong>Service:</strong> ${serviceLabel}</p>
     <p><strong>Requested time:</strong> ${whenLabel}</p>
     <p><strong>Location:</strong> 17 Princes Gate, London SW7 1PZ</p>
-    <p>Please bring all required documents for your service. If you need to change or cancel, contact us at ${notify}.</p>
+    <p>Please bring all required documents for your service. If you need to change or cancel, contact us at ${publicContact}.</p>
     <p>Embassy of Ethiopia · London</p>
   `;
 
-  const staff = await resend.emails.send({
-    from,
-    to: notify,
-    replyTo: applicant.email,
-    subject: `[Booking] ${serviceLabel} — ${applicant.fullName} — ${input.booking.date} ${input.booking.timeSlot}`,
-    html: staffHtml,
-  });
-
-  if (staff.error) {
-    throw new Error(staff.error.message);
+  let staffEmailId: string | null = null;
+  if (notify) {
+    const staff = await resend.emails.send({
+      from,
+      to: notify,
+      replyTo: applicant.email,
+      subject: `[Booking] ${serviceLabel} — ${applicant.fullName} — ${input.booking.date} ${input.booking.timeSlot}`,
+      html: staffHtml,
+    });
+    if (staff.error) {
+      throw new Error(staff.error.message);
+    }
+    staffEmailId = staff.data?.id ?? null;
+  } else {
+    console.info(
+      "[booking-email] Desk notify skipped — BOOKING_NOTIFY_EMAIL unset or blocked (master MFA inbox).",
+    );
   }
 
   const applicantMail = await resend.emails.send({
@@ -76,7 +86,7 @@ export async function sendBookingEmails(input: {
   }
 
   return {
-    staffEmailId: staff.data?.id ?? null,
+    staffEmailId,
     applicantEmailId: applicantMail.data?.id ?? null,
   };
 }

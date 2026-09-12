@@ -1,17 +1,18 @@
 "use server";
 
 import {
-  STRIPE_FEES,
   type CreateCheckoutSessionInput,
   type CreateCheckoutSessionResult,
 } from "@/lib/stripe/fees";
+import { getResolvedFees } from "@/lib/cms/content-store";
 import { getStripe, siteOrigin } from "@/lib/stripe/client";
 import { getCase, saveCase } from "@/lib/cases/store";
 
 export async function createStripeCheckoutSession(
   input: CreateCheckoutSessionInput,
 ): Promise<CreateCheckoutSessionResult> {
-  const fee = STRIPE_FEES[input.feeId];
+  const fees = await getResolvedFees();
+  const fee = fees[input.feeId];
   if (!fee) {
     return { ok: false, error: "Unknown fee selection." };
   }

@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import RecentAdminActivity from "@/components/admin/RecentAdminActivity";
+import { listAuditEntries } from "@/lib/audit/store";
 import { listCases } from "@/lib/cases/store";
 import { CASE_STATUS_LABELS, type CaseStatus } from "@/lib/cases/types";
+import { getResolvedFees } from "@/lib/cms/content-store";
 import { WORKFLOW_LIST } from "@/lib/consular/workflows";
 import { listBookingsForRange } from "@/lib/ops/bookings";
 import { BOOKING_SERVICE_LABELS } from "@/lib/booking/types";
-import { STRIPE_FEES, formatFeeAmount } from "@/lib/stripe/fees";
+import { formatFeeAmount } from "@/lib/stripe/fees";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -21,9 +24,11 @@ export default async function AdminDashboardPage() {
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 
-  const [cases, monthBookings] = await Promise.all([
+  const [cases, monthBookings, activity, fees] = await Promise.all([
     listCases(),
     listBookingsForRange(from, to),
+    listAuditEntries(12),
+    getResolvedFees(),
   ]);
   const awaitingPayment = cases.filter((c) => c.status === "awaiting_payment").length;
   const inReview = cases.filter((c) => c.status === "in_review").length;
@@ -223,7 +228,17 @@ export default async function AdminDashboardPage() {
               </li>
               <li>
                 <Link href="/admin/fees" className="hover:text-gold">
-                  Stripe fee catalogue →
+                  Fees & content →
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/employees" className="hover:text-gold">
+                  Employees →
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/staff" className="hover:text-gold">
+                  Staff accounts →
                 </Link>
               </li>
               <li>
@@ -236,13 +251,15 @@ export default async function AdminDashboardPage() {
         </section>
       </div>
 
+      <RecentAdminActivity entries={activity} />
+
       <section className="border border-navy/10 bg-white p-6 shadow-sm">
         <h2 className="font-display text-xl font-semibold text-navy">
           Active workflows
         </h2>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {WORKFLOW_LIST.map((workflow) => {
-            const fee = workflow.feeId ? STRIPE_FEES[workflow.feeId] : null;
+            const fee = workflow.feeId ? fees[workflow.feeId] : null;
             return (
               <li key={workflow.id} className="border border-line p-4 text-sm">
                 <p className="font-medium text-navy">{workflow.shortTitle}</p>

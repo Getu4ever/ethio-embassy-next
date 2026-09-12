@@ -1,5 +1,6 @@
 import CaseActionPanel from "@/components/admin/CaseActionPanel";
 import CaseDocumentViewer from "@/components/admin/CaseDocumentViewer";
+import CaseRecordEditor from "@/components/admin/CaseRecordEditor";
 import {
   CASE_STATUS_LABELS,
   type ConsularCase,
@@ -9,9 +10,14 @@ import type { ConsularWorkflow } from "@/lib/consular/workflows";
 type Props = {
   record: ConsularCase;
   workflow: ConsularWorkflow;
+  canEditDelete?: boolean;
 };
 
-export default function CaseDetailView({ record, workflow }: Props) {
+export default function CaseDetailView({
+  record,
+  workflow,
+  canEditDelete = false,
+}: Props) {
   return (
     <div className="grid gap-6 lg:grid-cols-12">
       <div className="space-y-6 lg:col-span-8">
@@ -64,6 +70,8 @@ export default function CaseDetailView({ record, workflow }: Props) {
             </div>
           ) : null}
         </section>
+
+        {canEditDelete ? <CaseRecordEditor record={record} /> : null}
 
         <section className="border border-navy/10 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="font-display text-xl font-semibold text-navy">

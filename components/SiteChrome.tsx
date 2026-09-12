@@ -3,9 +3,16 @@
 import { usePathname } from "next/navigation";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import type { OfficeHoursContent } from "@/lib/cms/types";
 import type { ReactNode } from "react";
 
-export default function SiteChrome({ children }: { children: ReactNode }) {
+export default function SiteChrome({
+  children,
+  officeHours,
+}: {
+  children: ReactNode;
+  officeHours: OfficeHoursContent;
+}) {
   const pathname = usePathname();
   const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
 
@@ -21,7 +28,7 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     <div className="flex min-h-full flex-1 flex-col" data-site-chrome>
       <Navbar />
       <div className="flex-1">{children}</div>
-      <Footer />
+      <Footer officeHours={officeHours} />
     </div>
   );
 }

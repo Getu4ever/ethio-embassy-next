@@ -10,9 +10,10 @@ import {
   listHolidays,
   removeHoliday,
 } from "@/lib/ops/holidays";
-import { countBookingsByDate, listBookingsForRange } from "@/lib/ops/bookings";
+import { countBookingsByDate, listBookingsForRange, updateBookingRecord, deleteBookingRecord, type BookingRecord } from "@/lib/ops/bookings";
 import type { AppointmentDayDensity, EmbassyHoliday } from "@/lib/ops/types";
-import { getStaffUsername, isStaffAuthenticated } from "@/lib/staff/auth";
+import { getSessionStaff, isStaffAuthenticated } from "@/lib/staff/auth";
+import { canManageRecords } from "@/lib/staff/permissions";
 
 export async function staffListAuditLog(
   limit = 100,
@@ -40,10 +41,11 @@ export async function staffAddHoliday(input: {
     return { ok: false, error: "Unauthorized." };
   }
   try {
+    const session = await getSessionStaff();
     const holiday = await addHoliday({
       date: input.date,
       label: input.label,
-      createdBy: getStaffUsername(),
+      createdBy: session?.displayName || session?.email || "staff",
     });
     await recordStaffAudit({
       action: "holiday.add",
@@ -131,4 +133,60 @@ export async function staffAppointmentDensity(input: {
     days,
     bookings,
   };
+}
+
+export async function staffUpdateBooking(
+  _prev: { ok?: boolean; error?: string } | null,
+  formData: FormData,
+): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    const user = await getSessionStaff();
+    if (!user) return { ok: false, error: "Unauthorized." };
+    if (!canManageRecords(user.role)) {
+      return { ok: false, error: "Only Master Admin or Director can edit appointments." };
+    }
+
+    const id = String(formData.get("id") ?? "");
+    const updated = await updateBookingRecord(id, {
+      service: String(formData.get("service") ?? "visa") as BookingRecord["service"],
+      date: String(formData.get("date") ?? ""),
+      timeSlot: String(formData.get("timeSlot") ?? ""),
+      applicantName: String(formData.get("applicantName") ?? ""),
+      applicantEmail: String(formData.get("applicantEmail") ?? ""),
+    });
+
+    await recordStaffAudit({
+      action: "booking.update",
+      module: "appointments",
+      summary: `Updated appointment for ${updated.applicantName} on ${updated.date}`,
+      targetId: updated.id,
+    });
+    revalidatePath("/admin/appointments");
+    revalidatePath("/admin");
+    revalidatePath("/booking");
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error ? error.message : "Could not update appointment.",
+    };
+  }
+}
+
+export async function staffDeleteBooking(formData: FormData): Promise<void> {
+  const user = await getSessionStaff();
+  if (!user || !canManageRecords(user.role)) return;
+
+  const id = String(formData.get("id") ?? "");
+  await deleteBookingRecord(id);
+  await recordStaffAudit({
+    action: "booking.delete",
+    module: "appointments",
+    summary: `Deleted appointment ${id}`,
+    targetId: id,
+  });
+  revalidatePath("/admin/appointments");
+  revalidatePath("/admin");
+  revalidatePath("/booking");
 }

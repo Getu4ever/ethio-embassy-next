@@ -1,10 +1,16 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useActionState, useMemo, useState, useTransition } from "react";
 import {
   staffAddHoliday,
+  staffDeleteBooking,
   staffRemoveHoliday,
+  staffUpdateBooking,
 } from "@/app/actions/ops";
+import {
+  BOOKING_SERVICE_LABELS,
+  type BookingServiceId,
+} from "@/lib/booking/types";
 import type { AppointmentDayDensity } from "@/lib/ops/types";
 import type { BookingRecord } from "@/lib/ops/bookings";
 
@@ -13,13 +19,12 @@ type Props = {
   initialMonth: number;
   days: AppointmentDayDensity[];
   bookings: BookingRecord[];
-  calendarConfigured: boolean;
-  resendConfigured: boolean;
+  canEditDelete: boolean;
 };
 
 function buildGrid(year: number, month: number): (number | null)[] {
   const first = new Date(year, month - 1, 1);
-  const startOffset = (first.getDay() + 6) % 7; // Monday-first
+  const startOffset = (first.getDay() + 6) % 7;
   const lastDay = new Date(year, month, 0).getDate();
   const cells: (number | null)[] = Array.from({ length: startOffset }, () => null);
   for (let d = 1; d <= lastDay; d += 1) cells.push(d);
@@ -40,8 +45,7 @@ export default function AppointmentOpsPanel({
   initialMonth,
   days,
   bookings,
-  calendarConfigured,
-  resendConfigured,
+  canEditDelete,
 }: Props) {
   const [year, setYear] = useState(initialYear);
   const [month, setMonth] = useState(initialMonth);
@@ -49,6 +53,7 @@ export default function AppointmentOpsPanel({
   const [label, setLabel] = useState("Embassy closed / holiday");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const dayMap = useMemo(() => {
     const map = new Map<string, AppointmentDayDensity>();
@@ -66,7 +71,6 @@ export default function AppointmentOpsPanel({
 
   const shiftMonth = (delta: number) => {
     const d = new Date(year, month - 1 + delta, 1);
-    // Full reload so server density refreshes for the new month
     window.location.href = `/admin/appointments?year=${d.getFullYear()}&month=${d.getMonth() + 1}`;
   };
 
@@ -98,25 +102,6 @@ export default function AppointmentOpsPanel({
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="border border-navy/10 bg-white p-5 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
-            Google Calendar
-          </p>
-          <p className="mt-2 font-display text-2xl font-semibold text-navy">
-            {calendarConfigured ? "Connected" : "Not configured"}
-          </p>
-        </div>
-        <div className="border border-navy/10 bg-white p-5 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
-            Resend email
-          </p>
-          <p className="mt-2 font-display text-2xl font-semibold text-navy">
-            {resendConfigured ? "Connected" : "Not configured"}
-          </p>
-        </div>
-      </div>
-
       <div className="grid gap-6 lg:grid-cols-12">
         <section className="border border-navy/10 bg-white p-5 shadow-sm lg:col-span-8 sm:p-6">
           <div className="flex items-center justify-between gap-3">
@@ -203,7 +188,7 @@ export default function AppointmentOpsPanel({
               Flag closed day
             </h3>
             <p className="mt-2 text-sm text-muted">
-              Selected dates block public booking on `/booking`.
+              Selected dates are closed for public booking.
             </p>
             <p className="mt-3 text-sm text-charcoal">
               {selectedDate ? (
@@ -247,34 +232,181 @@ export default function AppointmentOpsPanel({
               </p>
             ) : null}
           </div>
-
-          <div className="border border-navy/10 bg-white p-5 shadow-sm">
-            <h3 className="font-display text-lg font-semibold text-navy">
-              Month bookings
-            </h3>
-            <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto text-sm">
-              {bookings.map((b) => (
-                <li key={b.id} className="border-b border-line pb-2">
-                  <p className="font-medium text-navy">
-                    {b.date} · {b.timeSlot}
-                  </p>
-                  <p className="text-muted">
-                    {b.applicantName}
-                    {b.applicantEmail ? ` · ${b.applicantEmail}` : ""}
-                  </p>
-                  <p className="text-xs text-muted">
-                    {b.service}
-                    {b.eventId ? " · calendar synced" : ""}
-                  </p>
-                </li>
-              ))}
-              {bookings.length === 0 ? (
-                <li className="text-muted">No recorded bookings this month.</li>
-              ) : null}
-            </ul>
-          </div>
         </aside>
       </div>
+
+      <section className="border border-navy/10 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3 className="font-display text-xl font-semibold text-navy">
+              Month appointments
+            </h3>
+            <p className="mt-1 text-sm text-muted">
+              {canEditDelete
+                ? "Master Admin and Director can edit or remove bookings."
+                : "Open a booking to review applicant details."}
+            </p>
+          </div>
+        </div>
+
+        <ul className="mt-5 divide-y divide-line">
+          {bookings.map((booking) => (
+            <li key={booking.id} className="py-4">
+              {editingId === booking.id && canEditDelete ? (
+                <BookingEditForm
+                  booking={booking}
+                  onCancel={() => setEditingId(null)}
+                />
+              ) : (
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-navy">
+                      {booking.date} · {booking.timeSlot}
+                    </p>
+                    <p className="text-sm text-muted">
+                      {booking.applicantName}
+                      {booking.applicantEmail
+                        ? ` · ${booking.applicantEmail}`
+                        : ""}
+                    </p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted">
+                      {BOOKING_SERVICE_LABELS[
+                        booking.service as BookingServiceId
+                      ] ?? booking.service}
+                    </p>
+                  </div>
+                  {canEditDelete ? (
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setEditingId(booking.id)}
+                        className="text-xs font-semibold uppercase tracking-[0.1em] text-navy hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <form action={staffDeleteBooking}>
+                        <input type="hidden" name="id" value={booking.id} />
+                        <button
+                          type="submit"
+                          className="text-xs font-semibold uppercase tracking-[0.1em] text-crimson hover:underline"
+                          onClick={(e) => {
+                            if (
+                              !confirm(
+                                `Delete appointment for ${booking.applicantName} on ${booking.date}?`,
+                              )
+                            ) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </li>
+          ))}
+          {bookings.length === 0 ? (
+            <li className="py-8 text-center text-sm text-muted">
+              No recorded appointments this month.
+            </li>
+          ) : null}
+        </ul>
+      </section>
     </div>
+  );
+}
+
+function BookingEditForm({
+  booking,
+  onCancel,
+}: {
+  booking: BookingRecord;
+  onCancel: () => void;
+}) {
+  const [state, action, pending] = useActionState(staffUpdateBooking, null);
+
+  return (
+    <form action={action} className="grid gap-3 sm:grid-cols-2">
+      <input type="hidden" name="id" value={booking.id} />
+      <label className="block text-sm">
+        <span className="mb-1 block text-muted">Date</span>
+        <input
+          type="date"
+          name="date"
+          required
+          defaultValue={booking.date}
+          className="w-full border border-line px-3 py-2 outline-none focus:border-navy"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block text-muted">Time</span>
+        <input
+          type="time"
+          name="timeSlot"
+          required
+          defaultValue={booking.timeSlot}
+          className="w-full border border-line px-3 py-2 outline-none focus:border-navy"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block text-muted">Applicant name</span>
+        <input
+          name="applicantName"
+          required
+          defaultValue={booking.applicantName}
+          className="w-full border border-line px-3 py-2 outline-none focus:border-navy"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block text-muted">Email</span>
+        <input
+          type="email"
+          name="applicantEmail"
+          defaultValue={booking.applicantEmail}
+          className="w-full border border-line px-3 py-2 outline-none focus:border-navy"
+        />
+      </label>
+      <label className="block text-sm sm:col-span-2">
+        <span className="mb-1 block text-muted">Service</span>
+        <select
+          name="service"
+          defaultValue={booking.service}
+          className="w-full border border-line px-3 py-2 outline-none focus:border-navy"
+        >
+          {(Object.keys(BOOKING_SERVICE_LABELS) as BookingServiceId[]).map(
+            (service) => (
+              <option key={service} value={service}>
+                {BOOKING_SERVICE_LABELS[service]}
+              </option>
+            ),
+          )}
+        </select>
+      </label>
+      <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
+        <button
+          type="submit"
+          disabled={pending}
+          className="bg-navy px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white disabled:opacity-60"
+        >
+          {pending ? "Saving…" : "Save"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-xs font-semibold uppercase tracking-[0.12em] text-muted hover:text-navy"
+        >
+          Cancel
+        </button>
+        {state?.error ? (
+          <p className="text-sm text-crimson">{state.error}</p>
+        ) : null}
+        {state?.ok ? (
+          <p className="text-sm text-emerald">Saved</p>
+        ) : null}
+      </div>
+    </form>
   );
 }

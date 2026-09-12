@@ -35,13 +35,18 @@ async function readBlobJson<T>(key: string): Promise<T | null> {
         : new Date(meta.uploadedAt).toISOString();
     const res = await fetch(`${meta.url}?v=${encodeURIComponent(cacheKey)}`, {
       cache: "no-store",
+      signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    if (/not found|404/i.test(message)) return null;
-    throw error;
+    // Missing keys are expected until CMS content is saved the first time.
+    if (/not found|404|does not exist|aborted|timeout/i.test(message)) {
+      return null;
+    }
+    console.error(`[ops-store:read-blob] ${key}`, message);
+    return null;
   }
 }
 

@@ -3,6 +3,8 @@ import Link from "next/link";
 import CaseDetailView from "@/components/admin/CaseDetailView";
 import { getCase } from "@/lib/cases/store";
 import { CONSULAR_WORKFLOWS } from "@/lib/consular/workflows";
+import { canManageRecords } from "@/lib/staff/permissions";
+import { requireAdmin } from "@/lib/staff/session";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AdminCaseDetailPage({ params }: Props) {
+  const viewer = await requireAdmin();
   const { id } = await params;
   const record = await getCase(id);
   if (!record) notFound();
@@ -37,7 +40,11 @@ export default async function AdminCaseDetailPage({ params }: Props) {
           {record.reference}
         </h1>
       </div>
-      <CaseDetailView record={record} workflow={workflow} />
+      <CaseDetailView
+        record={record}
+        workflow={workflow}
+        canEditDelete={canManageRecords(viewer.role)}
+      />
     </div>
   );
 }

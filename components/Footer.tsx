@@ -3,9 +3,14 @@ import {
   governmentOnlineServices,
   importantLinks,
 } from "@/lib/content/navigation";
+import type { OfficeHoursContent } from "@/lib/cms/types";
 import { contact, site } from "@/lib/content/site";
 
-export default function Footer() {
+export default function Footer({
+  officeHours = contact.officeHours,
+}: {
+  officeHours?: OfficeHoursContent;
+}) {
   return (
     <footer className="mt-auto bg-navy-deep text-white">
       <div className="gold-rule" />
@@ -118,22 +123,22 @@ export default function Footer() {
             </h2>
             <div className="border border-white/10 bg-white/5 p-5">
               <p className="font-display text-sm font-semibold text-white">
-                {contact.officeHours.days}
+                {officeHours.days}
               </p>
               <div className="gold-rule my-3 opacity-50" />
               <p className="text-xs font-medium uppercase tracking-wider text-white/50">
                 Morning
               </p>
               <p className="mt-1 text-sm text-white/85">
-                {contact.officeHours.morning}
+                {officeHours.morning}
               </p>
               <p className="mt-3 text-xs font-medium uppercase tracking-wider text-white/50">
                 Afternoon
               </p>
               <p className="mt-1 text-sm text-white/85">
-                {contact.officeHours.afternoon}
+                {officeHours.afternoon}
               </p>
-              <p className="mt-4 text-xs text-white/55">{contact.officeHours.closed}</p>
+              <p className="mt-4 text-xs text-white/55">{officeHours.closed}</p>
             </div>
             <Link
               href="/booking"

@@ -6,16 +6,22 @@ import {
   sendCaseStatusEmail,
   sendCaseSubmittedEmails,
 } from "@/lib/cases/email";
-import { getCase, listCases, saveCase, storeCaseDocument } from "@/lib/cases/store";
+import { getCase, listCases, saveCase, storeCaseDocument, deleteCase } from "@/lib/cases/store";
 import {
   createCaseId,
   createReference,
   type CaseStatus,
   type ConsularCase,
+  type PaymentStatus,
 } from "@/lib/cases/types";
 import { getWorkflow, type ConsularWorkflowId } from "@/lib/consular/workflows";
-import { STRIPE_FEES } from "@/lib/stripe/fees";
-import { isStaffAuthenticated } from "@/lib/staff/auth";
+import { getResolvedFees } from "@/lib/cms/content-store";
+import { getSessionStaff, isStaffAuthenticated } from "@/lib/staff/auth";
+import {
+  assertPermission,
+  canManageRecords,
+} from "@/lib/staff/permissions";
+import { redirect } from "next/navigation";
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB
 
@@ -53,7 +59,8 @@ export async function submitConsularCase(
   const now = new Date().toISOString();
   const id = createCaseId();
   const feeId = workflow.feeId;
-  const needsPayment = Boolean(feeId && STRIPE_FEES[feeId]);
+  const fees = await getResolvedFees();
+  const needsPayment = Boolean(feeId && fees[feeId]);
 
   const record: ConsularCase = {
     id,
@@ -271,6 +278,86 @@ export async function rejectCase(
     status: "rejected",
     message: message?.trim() || "Application rejected by consular staff.",
   });
+}
+
+export async function staffUpdateCaseDetails(
+  _prev: { ok?: boolean; error?: string } | null,
+  formData: FormData,
+): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    const user = await getSessionStaff();
+    if (!user) return { ok: false, error: "Unauthorized." };
+    assertPermission(user, canManageRecords(user.role));
+
+    const caseId = String(formData.get("caseId") ?? "");
+    const record = await getCase(caseId);
+    if (!record) return { ok: false, error: "Case not found." };
+
+    const status = String(formData.get("status") ?? record.status) as CaseStatus;
+    const paymentStatus = String(
+      formData.get("paymentStatus") ?? record.paymentStatus,
+    ) as PaymentStatus;
+
+    record.applicant = {
+      fullName: String(formData.get("fullName") ?? record.applicant.fullName).trim(),
+      email: String(formData.get("email") ?? record.applicant.email).trim(),
+      phone: String(formData.get("phone") ?? record.applicant.phone).trim(),
+      passportNumber: String(
+        formData.get("passportNumber") ?? record.applicant.passportNumber,
+      ).trim(),
+      notes: String(formData.get("notes") ?? record.applicant.notes).trim(),
+    };
+    if (record.applicant.fullName.length < 2) {
+      return { ok: false, error: "Applicant name is required." };
+    }
+    record.status = status;
+    record.paymentStatus = paymentStatus;
+    record.updatedAt = new Date().toISOString();
+    record.staffNotes.push({
+      id: `n-${Date.now()}`,
+      at: record.updatedAt,
+      by: "staff",
+      body: `Case details updated by ${user.displayName}.`,
+    });
+
+    await saveCase(record);
+    await recordStaffAudit({
+      action: "case.update",
+      module: "cases",
+      summary: `Updated case ${record.reference}`,
+      targetId: record.id,
+    });
+    revalidatePath("/admin/cases");
+    revalidatePath(`/admin/cases/${record.id}`);
+    revalidatePath("/admin");
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Could not update case.",
+    };
+  }
+}
+
+export async function staffDeleteCase(formData: FormData): Promise<void> {
+  const user = await getSessionStaff();
+  if (!user || !canManageRecords(user.role)) return;
+
+  const caseId = String(formData.get("caseId") ?? "");
+  const record = await getCase(caseId);
+  if (!record) return;
+
+  await deleteCase(caseId);
+  await recordStaffAudit({
+    action: "case.delete",
+    module: "cases",
+    summary: `Deleted case ${record.reference}`,
+    targetId: caseId,
+    metadata: { reference: record.reference },
+  });
+  revalidatePath("/admin/cases");
+  revalidatePath("/admin");
+  redirect("/admin/cases");
 }
 
 export async function markCasePaidFromStripe(input: {

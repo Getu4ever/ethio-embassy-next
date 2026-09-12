@@ -3,11 +3,13 @@ import Link from "next/link";
 import {
   aboutUsHubPages,
   aboutUsPillars,
-  diplomaticStaff,
 } from "@/lib/content/about-us";
+import { listEmployees } from "@/lib/cms/employees";
 import { contact } from "@/lib/content/site";
 
-export default function AboutUsHub() {
+export default async function AboutUsHub() {
+  const employees = await listEmployees({ publishedOnly: true });
+
   return (
     <main className="bg-canvas">
       <section className="relative isolate min-h-[58vh] overflow-hidden text-white sm:min-h-[64vh]">
@@ -93,11 +95,11 @@ export default function AboutUsHub() {
             Diplomatic staff
           </h2>
           <ul className="mt-14 grid gap-12 sm:grid-cols-2 sm:gap-10 lg:gap-16">
-            {diplomaticStaff.map((person) => (
-              <li key={person.name} className="group">
+            {employees.map((person) => (
+              <li key={person.id} className="group">
                 <Link
                   href={
-                    person.role === "Head of Mission"
+                    /ambassador|head of mission/i.test(person.role)
                       ? "/the-ambassador"
                       : "/the-embassy"
                   }
@@ -118,8 +120,8 @@ export default function AboutUsHub() {
                         <div className="h-full w-full rounded-full bg-gradient-to-br from-[#e8d5a8] via-[#c5a572] to-[#7a6240] p-[1.5px]">
                           <div className="relative h-full w-full overflow-hidden rounded-full bg-navy/5">
                             <Image
-                              src={person.image.src}
-                              alt={person.image.alt}
+                              src={person.imageSrc}
+                              alt={person.imageAlt || person.name}
                               fill
                               className="object-cover object-top transition duration-700 group-hover:scale-[1.05]"
                               sizes="(max-width: 640px) 70vw, 304px"
@@ -144,8 +146,13 @@ export default function AboutUsHub() {
                     {person.name}
                   </h3>
                   <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
-                    {person.title}
+                    {person.bio}
                   </p>
+                  {(person.email || person.phone) && (
+                    <p className="mt-3 text-sm text-navy/80">
+                      {[person.email, person.phone].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
                 </Link>
               </li>
             ))}

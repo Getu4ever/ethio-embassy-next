@@ -5,22 +5,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { staffLogout } from "@/app/actions/staff";
+import { STAFF_ROLE_LABELS, type StaffRole } from "@/lib/staff/types";
 
 const NAV: { href: string; label: string; exact?: boolean }[] = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/cases", label: "Case queue" },
   { href: "/admin/appointments", label: "Appointments" },
-  { href: "/admin/fees", label: "Fee catalogue" },
-  { href: "/admin/audit", label: "Audit log" },
+  { href: "/admin/fees", label: "Fees & content" },
+  { href: "/admin/employees", label: "Employees" },
   { href: "/admin/staff", label: "Staff & access" },
+  { href: "/admin/audit", label: "Audit log" },
 ];
 
 export default function AdminShell({
   children,
   username,
+  role,
 }: {
   children: ReactNode;
   username: string;
+  role?: StaffRole;
 }) {
   const pathname = usePathname();
 
@@ -47,7 +51,13 @@ export default function AdminShell({
           </div>
           <div className="flex items-center gap-4 text-sm">
             <span className="hidden text-white/70 sm:inline">
-              Signed in as <strong className="text-white">{username}</strong>
+              <strong className="text-white">{username}</strong>
+              {role ? (
+                <span className="text-white/50">
+                  {" "}
+                  · {STAFF_ROLE_LABELS[role]}
+                </span>
+              ) : null}
             </span>
             <Link
               href="/"
@@ -95,7 +105,9 @@ export default function AdminShell({
             </ul>
           </nav>
           <div className="mt-4 border-t border-line px-3 pt-4 text-xs text-muted">
-            <p>Document workflows, Stripe fees, and appointment oversight.</p>
+            <p>
+              Cases, fees, staff accounts, employees, and activity oversight.
+            </p>
           </div>
         </aside>
 

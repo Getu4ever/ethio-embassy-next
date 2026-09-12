@@ -1,6 +1,8 @@
 import { Resend } from "resend";
+import { contact } from "@/lib/content/site";
 import { CASE_STATUS_LABELS, type ConsularCase } from "@/lib/cases/types";
 import { CONSULAR_WORKFLOWS } from "@/lib/consular/workflows";
+import { resolveDeskNotifyEmail } from "@/lib/notify/safe-email";
 
 function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -12,21 +14,23 @@ function mailer() {
   return {
     resend: new Resend(requireEnv("RESEND_API_KEY")),
     from: requireEnv("BOOKING_FROM_EMAIL"),
-    notify: requireEnv("BOOKING_NOTIFY_EMAIL"),
+    notify: resolveDeskNotifyEmail(),
+    publicContact: contact.email,
   };
 }
 
 export async function sendCaseSubmittedEmails(record: ConsularCase) {
-  const { resend, from, notify } = mailer();
+  const { resend, from, notify, publicContact } = mailer();
   const workflow = CONSULAR_WORKFLOWS[record.workflowId];
   const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
 
-  const staff = await resend.emails.send({
-    from,
-    to: notify,
-    replyTo: record.applicant.email,
-    subject: `[Case ${record.reference}] ${workflow.title} — ${record.applicant.fullName}`,
-    html: `
+  if (notify) {
+    const staff = await resend.emails.send({
+      from,
+      to: notify,
+      replyTo: record.applicant.email,
+      subject: `[Case ${record.reference}] ${workflow.title} — ${record.applicant.fullName}`,
+      html: `
       <h2>New consular document case</h2>
       <p><strong>Reference:</strong> ${record.reference}</p>
       <p><strong>Service:</strong> ${workflow.title}</p>
@@ -37,8 +41,13 @@ export async function sendCaseSubmittedEmails(record: ConsularCase) {
       <p><strong>Documents:</strong> ${record.documents.length}</p>
       ${origin ? `<p><a href="${origin}/admin/cases/${record.id}">Open in staff queue</a></p>` : ""}
     `,
-  });
-  if (staff.error) throw new Error(staff.error.message);
+    });
+    if (staff.error) throw new Error(staff.error.message);
+  } else {
+    console.info(
+      "[case-email] Desk notify skipped — BOOKING_NOTIFY_EMAIL unset or blocked (master MFA inbox).",
+    );
+  }
 
   const applicant = await resend.emails.send({
     from,
@@ -50,6 +59,7 @@ export async function sendCaseSubmittedEmails(record: ConsularCase) {
       <p><strong>Reference:</strong> ${record.reference}</p>
       <p>Status: ${CASE_STATUS_LABELS[record.status]}</p>
       <p>The consular desk will review your files. You will receive another email if we need more information or when a decision is ready.</p>
+      <p>Questions? Contact ${publicContact}.</p>
       <p>Embassy of Ethiopia · London</p>
     `,
   });
@@ -60,7 +70,7 @@ export async function sendCaseStatusEmail(
   record: ConsularCase,
   staffMessage?: string,
 ) {
-  const { resend, from, notify } = mailer();
+  const { resend, from, publicContact } = mailer();
   const workflow = CONSULAR_WORKFLOWS[record.workflowId];
 
   const result = await resend.emails.send({
@@ -71,7 +81,7 @@ export async function sendCaseStatusEmail(
       <p>Dear ${record.applicant.fullName},</p>
       <p>Your case <strong>${record.reference}</strong> (${workflow.title}) is now: <strong>${CASE_STATUS_LABELS[record.status]}</strong>.</p>
       ${staffMessage ? `<p><strong>Message from the desk:</strong> ${staffMessage}</p>` : ""}
-      <p>Questions? Contact ${notify}.</p>
+      <p>Questions? Contact ${publicContact}.</p>
       <p>Embassy of Ethiopia · London</p>
     `,
   });

@@ -4,7 +4,9 @@ export type AuditModule =
   | "fees"
   | "staff"
   | "auth"
-  | "system";
+  | "system"
+  | "content"
+  | "employees";
 
 export type AuditAction =
   | "case.approve"
@@ -12,10 +14,21 @@ export type AuditAction =
   | "case.request_info"
   | "case.status_update"
   | "case.view"
+  | "case.update"
+  | "case.delete"
   | "holiday.add"
   | "holiday.remove"
+  | "booking.update"
+  | "booking.delete"
   | "staff.login"
   | "staff.logout"
+  | "staff.create"
+  | "staff.update"
+  | "staff.delete"
+  | "content.update"
+  | "employee.create"
+  | "employee.update"
+  | "employee.delete"
   | "system.note";
 
 export type AuditEntry = {

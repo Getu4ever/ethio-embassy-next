@@ -115,5 +115,16 @@ export async function deleteCase(id: string): Promise<void> {
     await Promise.all(blobs.map((b) => del(b.url)));
     return;
   }
-  // Local: leave files; staff can clear .data manually
+  await ensureLocalDir();
+  const { unlink, rm } = await import("node:fs/promises");
+  try {
+    await unlink(path.join(LOCAL_ROOT, `${id}.json`));
+  } catch {
+    // already gone
+  }
+  try {
+    await rm(path.join(LOCAL_ROOT, id), { recursive: true, force: true });
+  } catch {
+    // no docs folder
+  }
 }

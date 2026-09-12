@@ -7,6 +7,10 @@ import {
   type ConsularBlock,
   type ConsularPage,
 } from "@/lib/content/consular";
+import {
+  getResolvedOfficeHours,
+  getSiteNotes,
+} from "@/lib/cms/content-store";
 import { contact } from "@/lib/content/site";
 import type { StripeFeeId } from "@/lib/stripe/fees";
 
@@ -202,7 +206,7 @@ export function ConsularPageBody({ page }: { page: ConsularPage }) {
   );
 }
 
-export function ConsularPageShell({
+export async function ConsularPageShell({
   page,
   currentHref,
   children,
@@ -211,6 +215,20 @@ export function ConsularPageShell({
   currentHref: string;
   children?: ReactNode;
 }) {
+  const [officeHours, notes] = await Promise.all([
+    getResolvedOfficeHours(),
+    getSiteNotes(),
+  ]);
+
+  const deskNote =
+    page.slug === "duty-free-notes"
+      ? notes.dutyFreeNotes
+      : page.slug === "criminal-record"
+        ? notes.tinRequest
+        : page.slug.includes("visa")
+          ? notes.visaDocuments
+          : notes.generalDesk;
+
   return (
     <main className="bg-canvas">
       <section className="relative isolate min-h-[58vh] overflow-hidden text-white sm:min-h-[64vh]">
@@ -262,6 +280,14 @@ export function ConsularPageShell({
 
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-12 lg:gap-16 lg:px-8">
         <article className="lg:col-span-7">
+          {deskNote ? (
+            <div className="mb-8 border border-gold/35 bg-gold/10 px-5 py-4 text-sm leading-relaxed text-navy">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                Desk note
+              </p>
+              <p className="mt-2 whitespace-pre-wrap">{deskNote}</p>
+            </div>
+          ) : null}
           {children ?? <ConsularPageBody page={page} />}
         </article>
 
@@ -275,11 +301,11 @@ export function ConsularPageShell({
             <p className="mt-3 text-sm leading-relaxed text-white/75">
               {contact.address}
               <br />
-              {contact.officeHours.days}
+              {officeHours.days}
               <br />
-              Morning {contact.officeHours.morning}
+              Morning {officeHours.morning}
               <br />
-              Afternoon {contact.officeHours.afternoon}
+              Afternoon {officeHours.afternoon}
             </p>
             <p className="mt-5 text-sm text-white/90">
               <a

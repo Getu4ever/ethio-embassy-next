@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import AppointmentOpsPanel from "@/components/admin/AppointmentOpsPanel";
 import { staffAppointmentDensity } from "@/app/actions/ops";
+import { canManageRecords } from "@/lib/staff/permissions";
+import { requireAdmin } from "@/lib/staff/session";
 
 export const metadata: Metadata = {
   title: "Appointments",
@@ -13,6 +15,7 @@ type Props = {
 };
 
 export default async function AdminAppointmentsPage({ searchParams }: Props) {
+  const viewer = await requireAdmin();
   const query = await searchParams;
   const now = new Date();
   const year = Number(query.year) || now.getFullYear();
@@ -22,22 +25,18 @@ export default async function AdminAppointmentsPage({ searchParams }: Props) {
   const days = density.ok ? density.days : [];
   const bookings = density.ok ? density.bookings : [];
 
-  const calendarConfigured = Boolean(
-    process.env.GOOGLE_CALENDAR_ID?.trim() &&
-      process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim() &&
-      process.env.GOOGLE_PRIVATE_KEY?.trim(),
-  );
-  const resendConfigured = Boolean(process.env.RESEND_API_KEY?.trim());
-
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-semibold text-navy">
-          Appointment operations
+          Appointments
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Review booking density, flag Embassy closed days, and keep public
-          `/booking` slots aligned with the mission calendar.
+          Review booking density, mark closed days, and manage appointment
+          records.
+          {canManageRecords(viewer.role)
+            ? " Master Admin and Director can edit or delete bookings."
+            : ""}
         </p>
       </div>
 
@@ -46,8 +45,7 @@ export default async function AdminAppointmentsPage({ searchParams }: Props) {
         initialMonth={month}
         days={days}
         bookings={bookings}
-        calendarConfigured={calendarConfigured}
-        resendConfigured={resendConfigured}
+        canEditDelete={canManageRecords(viewer.role)}
       />
     </div>
   );
