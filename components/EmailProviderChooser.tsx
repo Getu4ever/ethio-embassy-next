@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { contact } from "@/lib/content/site";
 
 type Props = {
@@ -138,9 +139,14 @@ export default function EmailProviderChooser({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const providers = buildProviders(email, subject, body);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -150,14 +156,16 @@ export default function EmailProviderChooser({
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
+    // Defer focus until portal content is mounted
+    const t = window.setTimeout(() => closeRef.current?.focus(), 0);
     return () => {
+      window.clearTimeout(t);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
   }, [open]);
 
-  const copyEmail = async () => {
+  async function copyEmail() {
     try {
       await navigator.clipboard.writeText(email);
       setCopied(true);
@@ -165,113 +173,124 @@ export default function EmailProviderChooser({
     } catch {
       setCopied(false);
     }
-  };
+  }
+
+  const dialog =
+    open && mounted
+      ? createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+            <button
+              type="button"
+              aria-label="Close email options"
+              className="absolute inset-0 bg-navy-deep/70 backdrop-blur-[2px]"
+              onClick={() => setOpen(false)}
+            />
+
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
+              className="relative flex max-h-[min(92dvh,36rem)] w-full max-w-md flex-col overflow-hidden border border-white/10 bg-white shadow-[0_28px_80px_rgba(7,21,40,0.45)]"
+            >
+              <div className="h-1 shrink-0 bg-gradient-to-r from-[#8a7048] via-gold to-[#f0e0bc]" />
+
+              <div className="flex shrink-0 items-start justify-between gap-4 px-5 pt-5 sm:px-6">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">
+                    {eyebrow}
+                  </p>
+                  <h2
+                    id={titleId}
+                    className="mt-1.5 font-display text-xl font-semibold text-navy sm:text-2xl"
+                  >
+                    Choose how to email
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    Open a ready-to-send message to{" "}
+                    <span className="font-medium text-navy">{email}</span>
+                  </p>
+                </div>
+                <button
+                  ref={closeRef}
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center border border-line text-navy/70 transition hover:border-navy hover:text-navy"
+                  aria-label="Close"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M4 4l8 8M12 4l-8 8"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                <ul className="mt-5 space-y-2 px-5 pb-2 sm:px-6">
+                  {providers.map((provider) => (
+                    <li key={provider.id}>
+                      <a
+                        href={provider.href}
+                        target={provider.external ? "_blank" : undefined}
+                        rel={
+                          provider.external ? "noopener noreferrer" : undefined
+                        }
+                        onClick={() => setOpen(false)}
+                        className="group flex items-center gap-3 border border-line bg-canvas/60 px-3.5 py-3 transition hover:border-gold/50 hover:bg-white"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-line bg-white">
+                          <ProviderIcon id={provider.id} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-semibold text-navy">
+                            {provider.name}
+                          </span>
+                          <span className="mt-0.5 block text-xs text-muted">
+                            {provider.description}
+                          </span>
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/40 transition group-hover:text-gold">
+                          Open →
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-3 border-t border-line bg-canvas px-5 py-4 sm:px-6">
+                  <button
+                    type="button"
+                    onClick={copyEmail}
+                    className="flex w-full items-center justify-between gap-3 border border-navy/15 bg-white px-3.5 py-3 text-left transition hover:border-navy/40"
+                  >
+                    <span>
+                      <span className="block text-sm font-semibold text-navy">
+                        {copied ? "Address copied" : "Copy email address"}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted">
+                        {email}
+                      </span>
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">
+                      {copied ? "Done" : "Copy"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className={className}>
         {label}
       </button>
-
-      {open ? (
-        <div className="fixed inset-0 z-[90] flex items-end justify-center p-4 sm:items-center">
-          <button
-            type="button"
-            aria-label="Close email options"
-            className="absolute inset-0 bg-navy-deep/70 backdrop-blur-[2px]"
-            onClick={() => setOpen(false)}
-          />
-
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            className="relative w-full max-w-md overflow-hidden border border-white/10 bg-white shadow-[0_28px_80px_rgba(7,21,40,0.45)]"
-          >
-            <div className="h-1 bg-gradient-to-r from-[#8a7048] via-gold to-[#f0e0bc]" />
-
-            <div className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-6">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">
-                  {eyebrow}
-                </p>
-                <h2
-                  id={titleId}
-                  className="mt-1.5 font-display text-xl font-semibold text-navy sm:text-2xl"
-                >
-                  Choose how to email
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
-                  Open a ready-to-send message to{" "}
-                  <span className="font-medium text-navy">{email}</span>
-                </p>
-              </div>
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={() => setOpen(false)}
-                className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center border border-line text-navy/70 transition hover:border-navy hover:text-navy"
-                aria-label="Close"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
-                  <path
-                    d="M4 4l8 8M12 4l-8 8"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <ul className="mt-5 space-y-2 px-5 pb-2 sm:px-6">
-              {providers.map((provider) => (
-                <li key={provider.id}>
-                  <a
-                    href={provider.href}
-                    target={provider.external ? "_blank" : undefined}
-                    rel={provider.external ? "noopener noreferrer" : undefined}
-                    onClick={() => setOpen(false)}
-                    className="group flex items-center gap-3 border border-line bg-canvas/60 px-3.5 py-3 transition hover:border-gold/50 hover:bg-white"
-                  >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-line bg-white">
-                      <ProviderIcon id={provider.id} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-navy">
-                        {provider.name}
-                      </span>
-                      <span className="mt-0.5 block text-xs text-muted">
-                        {provider.description}
-                      </span>
-                    </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/40 transition group-hover:text-gold">
-                      Open →
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-3 border-t border-line bg-canvas px-5 py-4 sm:px-6">
-              <button
-                type="button"
-                onClick={copyEmail}
-                className="flex w-full items-center justify-between gap-3 border border-navy/15 bg-white px-3.5 py-3 text-left transition hover:border-navy/40"
-              >
-                <span>
-                  <span className="block text-sm font-semibold text-navy">
-                    {copied ? "Address copied" : "Copy email address"}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-muted">{email}</span>
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">
-                  {copied ? "Done" : "Copy"}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {dialog}
     </>
   );
 }

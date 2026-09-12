@@ -102,10 +102,6 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  icons: {
-    icon: "/images/cropped-icon-32x32.png",
-    apple: "/images/cropped-icon-180x180.png",
-  },
 };
 
 export const viewport: Viewport = {

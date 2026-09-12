@@ -1,4 +1,5 @@
 import Link from "next/link";
+import EmailProviderChooser from "@/components/EmailProviderChooser";
 import {
   governmentOnlineServices,
   importantLinks,
@@ -35,12 +36,11 @@ export default function Footer({
                 </a>
               </p>
               <p className="break-all">
-                <a
-                  href={`mailto:${contact.email}`}
-                  className="transition hover:text-gold"
-                >
-                  {contact.email}
-                </a>
+                <EmailProviderChooser
+                  label={contact.email}
+                  eyebrow="Embassy desk"
+                  className="text-left transition hover:text-gold"
+                />
               </p>
             </div>
 
