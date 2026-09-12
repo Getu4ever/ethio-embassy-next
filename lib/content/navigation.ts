@@ -50,11 +50,11 @@ export const primaryNav: NavItem[] = [
       },
       { label: "Lassiez-passer", href: "/lassiez-passer" },
       {
-        label: "Authentication/Legalization and Power of Attorney",
+        label: "Authentication & Legalization",
         href: "/legalization",
       },
       {
-        label: "Criminal Record and TIN Number Services",
+        label: "Criminal Record & TIN",
         href: "/criminal-record",
       },
       { label: "Duty-Free Notes", href: "/duty-free-notes" },

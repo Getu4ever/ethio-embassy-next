@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import EmailProviderChooser from "@/components/EmailProviderChooser";
 import StripeCheckoutButton from "@/components/StripeCheckoutButton";
 import {
   consularNav,
@@ -266,12 +267,10 @@ export async function ConsularPageShell({
             >
               Submit documents
             </Link>
-            <a
-              href={`mailto:${contact.email}`}
-              className="inline-flex border border-white/35 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-white transition hover:border-gold hover:text-gold"
-            >
-              Email consular desk
-            </a>
+            <EmailProviderChooser
+              subject={`Consular enquiry — ${page.pageTitle}`}
+              body={`Dear Consular Desk,\n\nI am writing regarding ${page.pageTitle.toLowerCase()}.\n\n\n\nKind regards,\n`}
+            />
           </div>
         </div>
       </section>
@@ -315,12 +314,11 @@ export async function ConsularPageShell({
                 {contact.phoneDisplay}
               </a>
               <br />
-              <a
-                href={`mailto:${contact.email}`}
+              <EmailProviderChooser
+                label={contact.email}
+                subject={`Consular enquiry — ${page.pageTitle}`}
                 className="transition hover:text-gold"
-              >
-                {contact.email}
-              </a>
+              />
             </p>
             <Link
               href="/booking"

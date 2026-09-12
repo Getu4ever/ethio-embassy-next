@@ -189,7 +189,7 @@ function DesktopDropdown({
       <ul
         id={id}
         role="menu"
-        className={`absolute left-0 top-[calc(100%-2px)] z-[60] min-w-[17.5rem] border border-white/10 pt-2 shadow-xl transition-[opacity,visibility] duration-150 ${
+        className={`absolute left-0 top-[calc(100%-2px)] z-[60] min-w-[17.5rem] border border-white/10 py-1.5 shadow-xl transition-[opacity,visibility] duration-150 ${
           open
             ? "visible opacity-100"
             : "invisible pointer-events-none opacity-0"
@@ -200,7 +200,7 @@ function DesktopDropdown({
             <Link
               role="menuitem"
               href={child.href}
-              className="block px-4 py-3 text-sm text-white/90 transition hover:bg-white/10 hover:text-[#dbbf8a]"
+              className="block px-4 py-2 text-sm leading-snug text-white/90 transition hover:bg-white/10 hover:text-[#dbbf8a]"
               onClick={onClose}
             >
               {child.label}
@@ -532,12 +532,12 @@ export default function Navbar() {
                       </span>
                     </button>
                     {openMenu === item.label ? (
-                      <ul className="mb-2 space-y-0.5 pb-1 pl-8">
+                      <ul className="mb-1.5 space-y-0 pb-0.5 pl-8">
                         {item.children.map((child) => (
                           <li key={child.href}>
                             <Link
                               href={child.href}
-                              className="block min-h-11 py-3 text-sm text-white/75 hover:text-white"
+                              className="block py-2 text-sm leading-snug text-white/75 hover:text-white"
                               onClick={closeAll}
                             >
                               {child.label}

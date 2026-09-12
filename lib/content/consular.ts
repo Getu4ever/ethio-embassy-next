@@ -26,12 +26,12 @@ export const consularNav: ConsularNavItem[] = [
     href: "/lassiez-passer",
   },
   {
-    label: "Authentication/Legalization and Power of Attorney",
+    label: "Authentication & Legalization",
     shortLabel: "Legalization",
     href: "/legalization",
   },
   {
-    label: "Criminal Record and TIN Number Services",
+    label: "Criminal Record & TIN",
     shortLabel: "Police / TIN",
     href: "/criminal-record",
   },
