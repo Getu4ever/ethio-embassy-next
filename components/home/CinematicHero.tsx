@@ -7,6 +7,10 @@ import { heroIntro } from "@/lib/content/site";
 
 const HERO_SLIDES = [
   {
+    src: "/legacy-site/images/hero-images/lalibela.jpg",
+    alt: "Rock-hewn churches of Lalibela, Ethiopia",
+  },
+  {
     src: "/legacy-site/images/hero-images/sofomar.jpg",
     alt: "Sof Omar caves landscape, Ethiopia",
   },
@@ -17,10 +21,6 @@ const HERO_SLIDES = [
   {
     src: "/legacy-site/images/hero-images/3Terara.jpg",
     alt: "Ethiopian highland scenery",
-  },
-  {
-    src: "/legacy-site/images/hero-images/lalibela.jpg",
-    alt: "Rock-hewn churches of Lalibela, Ethiopia",
   },
 ] as const;
 
