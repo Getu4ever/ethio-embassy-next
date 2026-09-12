@@ -1,10 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
+import EmailProviderChooser from "@/components/EmailProviderChooser";
 import {
   investmentBusinessDesk,
   investmentSectors,
   type InvestmentSector,
 } from "@/lib/content/investment";
+
+const businessEmailSubject =
+  "Investment enquiry — Embassy of Ethiopia, London";
+const businessEmailBody =
+  "Dear Business Desk,\n\nI would like to discuss investment opportunities in Ethiopia.\n\n\n\nKind regards,\n";
 
 function SectorNav({ currentHref }: { currentHref: string }) {
   return (
@@ -81,12 +87,13 @@ export function InvestmentSectorPage({ sector }: { sector: InvestmentSector }) {
             >
               Explore on EIC
             </a>
-            <a
-              href={`mailto:${investmentBusinessDesk.email}`}
-              className="inline-flex border border-white/35 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-white transition hover:border-gold hover:text-gold"
-            >
-              Contact business desk
-            </a>
+            <EmailProviderChooser
+              email={investmentBusinessDesk.email}
+              subject={businessEmailSubject}
+              body={businessEmailBody}
+              label="Contact business desk"
+              eyebrow="Business desk"
+            />
           </div>
         </div>
       </section>
@@ -168,12 +175,14 @@ export function InvestmentSectorPage({ sector }: { sector: InvestmentSector }) {
                 {investmentBusinessDesk.tel}
               </a>
               <br />
-              <a
-                href={`mailto:${investmentBusinessDesk.email}`}
+              <EmailProviderChooser
+                email={investmentBusinessDesk.email}
+                subject={`${sector.title} enquiry — Embassy of Ethiopia, London`}
+                body={`Dear Business Desk,\n\nI would like to discuss ${sector.title.toLowerCase()} opportunities in Ethiopia.\n\n\n\nKind regards,\n`}
+                label={investmentBusinessDesk.email}
+                eyebrow="Business desk"
                 className="transition hover:text-gold"
-              >
-                {investmentBusinessDesk.email}
-              </a>
+              />
             </p>
           </div>
         </aside>

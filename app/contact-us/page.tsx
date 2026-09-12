@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import EmailProviderChooser from "@/components/EmailProviderChooser";
 import { contact } from "@/lib/content/site";
 
 export const metadata: Metadata = {
@@ -38,12 +39,11 @@ export default function ContactUsPage() {
               </li>
               <li className="break-all">
                 <span className="font-semibold text-navy">Email: </span>
-                <a
-                  href={`mailto:${contact.email}`}
+                <EmailProviderChooser
+                  label={contact.email}
+                  eyebrow="Embassy desk"
                   className="hover:text-emerald"
-                >
-                  {contact.email}
-                </a>
+                />
               </li>
             </ul>
           </div>

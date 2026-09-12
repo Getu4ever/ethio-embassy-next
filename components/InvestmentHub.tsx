@@ -1,11 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
+import EmailProviderChooser from "@/components/EmailProviderChooser";
 import {
   investmentBusinessDesk,
   investmentPillars,
   investmentResourceGroups,
   investmentSectors,
 } from "@/lib/content/investment";
+
+const businessEmailSubject =
+  "Investment enquiry — Embassy of Ethiopia, London";
+const businessEmailBody =
+  "Dear Business Desk,\n\nI would like to discuss investment opportunities in Ethiopia.\n\n\n\nKind regards,\n";
 
 export default function InvestmentHub() {
   const featured = investmentSectors.filter((s) => s.slug !== "invest-in-ethiopia");
@@ -46,12 +52,13 @@ export default function InvestmentHub() {
             >
               Start with EIC
             </a>
-            <a
-              href={`mailto:${investmentBusinessDesk.email}`}
-              className="inline-flex border border-white/35 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-white transition hover:border-gold hover:text-gold"
-            >
-              Speak to our desk
-            </a>
+            <EmailProviderChooser
+              email={investmentBusinessDesk.email}
+              subject={businessEmailSubject}
+              body={businessEmailBody}
+              label="Speak to our desk"
+              eyebrow="Business desk"
+            />
           </div>
         </div>
       </section>
@@ -280,12 +287,14 @@ export default function InvestmentHub() {
                 {investmentBusinessDesk.tel}
               </a>
               <br />
-              <a
-                href={`mailto:${investmentBusinessDesk.email}`}
+              <EmailProviderChooser
+                email={investmentBusinessDesk.email}
+                subject={businessEmailSubject}
+                body={businessEmailBody}
+                label={investmentBusinessDesk.email}
+                eyebrow="Business desk"
                 className="transition hover:text-gold"
-              >
-                {investmentBusinessDesk.email}
-              </a>
+              />
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <a

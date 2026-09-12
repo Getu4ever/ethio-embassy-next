@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import EmailProviderChooser from "@/components/EmailProviderChooser";
 import { aboutUsNav } from "@/lib/content/about-us";
 import { contact } from "@/lib/content/site";
 
@@ -128,12 +129,10 @@ export function AboutUsShell({
                 {contact.phoneDisplay}
               </a>
               <br />
-              <a
-                href={`mailto:${contact.email}`}
+              <EmailProviderChooser
+                label={contact.email}
                 className="transition hover:text-gold"
-              >
-                {contact.email}
-              </a>
+              />
             </p>
           </div>
         </aside>

@@ -9,6 +9,8 @@ type Props = {
   body?: string;
   label?: string;
   className?: string;
+  /** Small uppercase label above the dialog title */
+  eyebrow?: string;
 };
 
 type Provider = {
@@ -132,6 +134,7 @@ export default function EmailProviderChooser({
   body = "Dear Consular Desk,\n\nI would like to enquire about the following:\n\n\n\nKind regards,\n",
   label = "Email consular desk",
   className = "inline-flex border border-white/35 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-white transition hover:border-gold hover:text-gold",
+  eyebrow = "Consular desk",
 }: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -190,7 +193,7 @@ export default function EmailProviderChooser({
             <div className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-6">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">
-                  Consular desk
+                  {eyebrow}
                 </p>
                 <h2
                   id={titleId}
