@@ -15,7 +15,7 @@ import { primaryNav, type NavItem } from "@/lib/content/navigation";
 
 const LOGO_SRC = "/images/logo-uk.png";
 const BUILDING_SRC = "/images/london-ethio-building.jpg";
-const WORLD_MAP_SRC = "/images/world-map-header.jpg";
+const WORLD_MAP_SRC = "/images/world-map-header-v2.jpg";
 const ETHIO_UK_SRC = "/images/ethio-uk-modified.png";
 
 const menuItems: NavItem[] = primaryNav.filter(
