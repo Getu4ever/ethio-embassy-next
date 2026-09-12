@@ -199,14 +199,13 @@ export const photoGallery: GalleryItem[] = [
   },
   {
     src: "/legacy-site/images/hero-images/ethiopian-airlines.jpg",
-    alt: "Ethiopian Airlines Cargo aircraft",
-    caption: "Ethiopian Airlines Cargo",
+    alt: "Ethiopian Airlines aircraft",
+    caption: "Ethiopian Airlines is Africa's largest airline.",
   },
   {
     src: "/legacy-site/images/hero-images/ethiopian-airlines02.jpg",
     alt: "Ethiopian Airlines cabin crew",
-    caption:
-      "Ethiopian Airlines is Africa's largest airline in terms of passengers carried, destinations served, fleet size, and revenue.",
+    caption: "Ethiopian Airlines — known for its hospitality",
   },
   {
     src: "/images/about-ethiopia/addis-ababa-african-union.jpeg",

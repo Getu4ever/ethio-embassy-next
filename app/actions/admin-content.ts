@@ -8,6 +8,10 @@ import {
   type FeeOverride,
   type SiteContent,
 } from "@/lib/cms/content-store";
+import {
+  VITAL_EVENTS_FEE_IDS,
+  VITAL_EVENTS_FEE_LABELS,
+} from "@/lib/cms/types";
 import { getSessionStaff } from "@/lib/staff/auth";
 import {
   assertPermission,
@@ -129,7 +133,21 @@ export async function adminSaveFees(
       fees[id] = override;
     }
 
-    const next: SiteContent = { ...current, fees };
+    const vitalEventsFees = { ...current.vitalEventsFees };
+    for (const id of VITAL_EVENTS_FEE_IDS) {
+      const raw = String(formData.get(`vital-${id}`) ?? "").trim();
+      if (!raw) continue;
+      const amountUsd = Number(raw);
+      if (!Number.isFinite(amountUsd) || amountUsd < 0) {
+        return {
+          ok: false,
+          error: `Invalid USD amount for ${VITAL_EVENTS_FEE_LABELS[id]}.`,
+        };
+      }
+      vitalEventsFees[id] = { amountUsd };
+    }
+
+    const next: SiteContent = { ...current, fees, vitalEventsFees };
     await saveSiteContent(next, actor.displayName);
     await recordStaffAudit({
       action: "content.update",
@@ -139,6 +157,7 @@ export async function adminSaveFees(
     revalidatePath("/admin/fees");
     revalidatePath("/admin/content");
     revalidatePath("/apply");
+    revalidatePath("/vital-events");
     return { ok: true };
   } catch (error) {
     return {

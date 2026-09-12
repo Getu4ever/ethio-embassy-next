@@ -7,6 +7,10 @@ import {
   adminSaveSiteNotes,
 } from "@/app/actions/admin-content";
 import type { SiteContent } from "@/lib/cms/content-store";
+import {
+  VITAL_EVENTS_FEE_IDS,
+  VITAL_EVENTS_FEE_LABELS,
+} from "@/lib/cms/types";
 import type { StripeFee } from "@/lib/stripe/fees";
 
 export default function SiteContentEditor({
@@ -112,7 +116,8 @@ export default function SiteContentEditor({
           Service fees
         </h2>
         <p className="mt-1 text-sm text-muted">
-          Amounts in GBP. Changes apply to Stripe Checkout and the applicant portal.
+          Stripe Checkout fees are in GBP. Vital Events certificate fees are in
+          USD and update the public /vital-events page.
         </p>
         <form action={feesAction} className="mt-5 space-y-5">
           {fees.map((fee) => (
@@ -163,6 +168,47 @@ export default function SiteContentEditor({
               </label>
             </div>
           ))}
+
+          {VITAL_EVENTS_FEE_IDS.map((id) => (
+            <div
+              key={id}
+              className="grid gap-3 border border-line p-4 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              <div className="sm:col-span-2 lg:col-span-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+                  vital-events · {id}
+                </p>
+              </div>
+              <label className="block text-sm sm:col-span-2">
+                <span className="mb-1 block text-muted">Label</span>
+                <input
+                  value={VITAL_EVENTS_FEE_LABELS[id]}
+                  readOnly
+                  className="w-full border border-line bg-canvas px-3 py-2 text-charcoal outline-none"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="mb-1 block text-muted">Amount (USD)</span>
+                <input
+                  name={`vital-${id}`}
+                  type="number"
+                  step="1"
+                  min="0"
+                  defaultValue={content.vitalEventsFees[id].amountUsd}
+                  className="w-full border border-line px-3 py-2 outline-none focus:border-navy"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="mb-1 block text-muted">Shown on</span>
+                <input
+                  value="/vital-events"
+                  readOnly
+                  className="w-full border border-line bg-canvas px-3 py-2 text-charcoal outline-none"
+                />
+              </label>
+            </div>
+          ))}
+
           <SaveRow pending={feesPending} state={feesState} />
         </form>
       </section>

@@ -10,13 +10,23 @@ import type {
   OfficeHoursContent,
   SiteContent,
   SiteNotesContent,
+  VitalEventsFeeId,
+  VitalEventsFeesContent,
 } from "@/lib/cms/types";
+import { VITAL_EVENTS_FEE_IDS } from "@/lib/cms/types";
 
 export type {
   FeeOverride,
   OfficeHoursContent,
   SiteContent,
   SiteNotesContent,
+  VitalEventsFeeId,
+  VitalEventsFeesContent,
+} from "@/lib/cms/types";
+
+export {
+  VITAL_EVENTS_FEE_IDS,
+  VITAL_EVENTS_FEE_LABELS,
 } from "@/lib/cms/types";
 
 const BLOB_KEY = "ops/site-content.json";
@@ -32,12 +42,36 @@ const DEFAULT_NOTES: SiteNotesContent = {
     "Office hours and service notes may be updated by authorised staff. Always verify the latest guidance before travelling to Princes Gate.",
 };
 
+const DEFAULT_VITAL_EVENTS_FEES: VitalEventsFeesContent = {
+  birth: { amountUsd: 30 },
+  marriage: { amountUsd: 30 },
+  divorce: { amountUsd: 30 },
+  death: { amountUsd: 20 },
+};
+
 function defaults(): SiteContent {
   return {
     officeHours: { ...contact.officeHours },
     fees: {},
     notes: { ...DEFAULT_NOTES },
+    vitalEventsFees: { ...DEFAULT_VITAL_EVENTS_FEES },
   };
+}
+
+function mergeVitalEventsFees(
+  stored?: Partial<VitalEventsFeesContent> | null,
+): VitalEventsFeesContent {
+  const result = { ...DEFAULT_VITAL_EVENTS_FEES };
+  if (!stored) return result;
+  for (const id of VITAL_EVENTS_FEE_IDS) {
+    const entry = stored[id];
+    if (!entry) continue;
+    const amount = Number(entry.amountUsd);
+    if (Number.isFinite(amount) && amount >= 0) {
+      result[id] = { amountUsd: amount };
+    }
+  }
+  return result;
 }
 
 export async function getSiteContent(): Promise<SiteContent> {
@@ -48,6 +82,7 @@ export async function getSiteContent(): Promise<SiteContent> {
     officeHours: { ...base.officeHours, ...stored.officeHours },
     fees: { ...stored.fees },
     notes: { ...base.notes, ...stored.notes },
+    vitalEventsFees: mergeVitalEventsFees(stored.vitalEventsFees),
     updatedAt: stored.updatedAt,
     updatedBy: stored.updatedBy,
   };
@@ -95,4 +130,9 @@ export async function getResolvedFees(): Promise<Record<StripeFeeId, StripeFee>>
 export async function getSiteNotes(): Promise<SiteNotesContent> {
   const content = await getSiteContent();
   return content.notes;
+}
+
+export async function getResolvedVitalEventsFees(): Promise<VitalEventsFeesContent> {
+  const content = await getSiteContent();
+  return content.vitalEventsFees;
 }

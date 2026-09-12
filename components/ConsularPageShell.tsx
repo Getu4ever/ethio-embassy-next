@@ -10,34 +10,57 @@ import {
 } from "@/lib/content/consular";
 import {
   getResolvedOfficeHours,
+  getResolvedVitalEventsFees,
   getSiteNotes,
+  type VitalEventsFeesContent,
 } from "@/lib/cms/content-store";
 import { contact } from "@/lib/content/site";
 import type { StripeFeeId } from "@/lib/stripe/fees";
 
-function Block({ block }: { block: ConsularBlock }) {
+function applyVitalFeeCopy(
+  text: string,
+  amountUsd: number,
+): string {
+  return text.replaceAll("{{amount}}", String(amountUsd));
+}
+
+function Block({
+  block,
+  amountUsd,
+}: {
+  block: ConsularBlock;
+  amountUsd?: number;
+}) {
   switch (block.type) {
     case "paragraph":
       return (
         <p className="text-base leading-[1.8] text-muted sm:text-lg">
-          {block.text}
+          {typeof amountUsd === "number"
+            ? applyVitalFeeCopy(block.text, amountUsd)
+            : block.text}
         </p>
       );
     case "bullets":
       return (
         <ul className="space-y-3">
-          {block.items.map((item) => (
-            <li
-              key={item}
-              className="flex gap-3 text-base leading-relaxed text-muted sm:text-[17px]"
-            >
-              <span
-                aria-hidden
-                className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold"
-              />
-              <span>{item}</span>
-            </li>
-          ))}
+          {block.items.map((item) => {
+            const text =
+              typeof amountUsd === "number"
+                ? applyVitalFeeCopy(item, amountUsd)
+                : item;
+            return (
+              <li
+                key={text}
+                className="flex gap-3 text-base leading-relaxed text-muted sm:text-[17px]"
+              >
+                <span
+                  aria-hidden
+                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold"
+                />
+                <span>{text}</span>
+              </li>
+            );
+          })}
         </ul>
       );
     case "links":
@@ -162,13 +185,27 @@ function StripeAside({ fees }: { fees: StripeFeeId[] }) {
   );
 }
 
-export function ConsularPageBody({ page }: { page: ConsularPage }) {
+export function ConsularPageBody({
+  page,
+  vitalEventsFees,
+}: {
+  page: ConsularPage;
+  vitalEventsFees?: VitalEventsFeesContent;
+}) {
   const lede = page.lede;
   let skippedLede = false;
 
   return (
     <div className="space-y-12">
       {page.sections.map((section, index) => {
+        const amountUsd = section.feeKey
+          ? vitalEventsFees?.[section.feeKey]?.amountUsd
+          : undefined;
+        const heading =
+          section.heading && typeof amountUsd === "number"
+            ? `${section.heading} — $${amountUsd}`
+            : section.heading;
+
         const blocks = section.blocks.filter((block) => {
           if (
             !skippedLede &&
@@ -187,17 +224,17 @@ export function ConsularPageBody({ page }: { page: ConsularPage }) {
 
         return (
           <section key={`${section.heading ?? "section"}-${index}`}>
-            {section.heading ? (
+            {heading ? (
               <div className="mb-5">
                 <h2 className="font-display text-2xl font-semibold tracking-tight text-navy">
-                  {section.heading}
+                  {heading}
                 </h2>
                 <div className="mt-3 h-px w-14 bg-gold" />
               </div>
             ) : null}
             <div className="space-y-5">
               {blocks.map((block, i) => (
-                <Block key={i} block={block} />
+                <Block key={i} block={block} amountUsd={amountUsd} />
               ))}
             </div>
           </section>
@@ -216,9 +253,12 @@ export async function ConsularPageShell({
   currentHref: string;
   children?: ReactNode;
 }) {
-  const [officeHours, notes] = await Promise.all([
+  const [officeHours, notes, vitalEventsFees] = await Promise.all([
     getResolvedOfficeHours(),
     getSiteNotes(),
+    page.slug === "vital-events"
+      ? getResolvedVitalEventsFees()
+      : Promise.resolve(undefined),
   ]);
 
   const deskNote =
@@ -287,7 +327,9 @@ export async function ConsularPageShell({
               <p className="mt-2 whitespace-pre-wrap">{deskNote}</p>
             </div>
           ) : null}
-          {children ?? <ConsularPageBody page={page} />}
+          {children ?? (
+            <ConsularPageBody page={page} vitalEventsFees={vitalEventsFees} />
+          )}
         </article>
 
         <aside className="space-y-6 lg:col-span-5">

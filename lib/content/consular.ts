@@ -74,6 +74,8 @@ export type ConsularBlock =
 
 export type ConsularSection = {
   heading?: string;
+  /** When set, heading/fee copy use CMS Vital Events USD amounts. */
+  feeKey?: "birth" | "marriage" | "divorce" | "death";
   blocks: ConsularBlock[];
 };
 
@@ -628,6 +630,8 @@ export const consularPages: Record<string, ConsularPage> = {
       alt: "Registry documents for vital events services",
       position: "object-center",
     },
+    showStripe: true,
+    stripeFees: ["vital-events"],
     sections: [
       {
         blocks: [
@@ -642,7 +646,8 @@ export const consularPages: Record<string, ConsularPage> = {
         ],
       },
       {
-        heading: "የልደት ምዝገባ (Birth) — $30",
+        heading: "የልደት ምዝገባ (Birth)",
+        feeKey: "birth",
         blocks: [
           {
             type: "bullets",
@@ -652,13 +657,14 @@ export const consularPages: Record<string, ConsularPage> = {
               "የልደት አስመዝጋቢው ከጤና ተቋም የተሰጠውን የልደት ማሳወቂያ ቅጽ ማቅረብ አለበት። ሆኖም ምዝገባው ከመጀመሩ በፊት የተከሰተን ልደት ምዝገባን አይጨምርም።",
               "የህጻኑ አሳዳጊ ወይም ተንከባካቢ ልደቱን ለማስመዝገብ ሕጋዊ የአሳዳሪነት ወይም ተንከባካቢነት ማስረጃ ማቅረብ አለባቸው።",
               "ዕድሜው አስራ ስምንት ዓመትና በላይ የሆነ ስደተኛ ወላጆቹን የሚገልፅ ማስረጃ ከስደተኞች መረጃ ዳታ ቤዝ ላይ መረጃው የሌለ እንደሆነ ስደተኛውን በመጠየቅ መመዝገብ አለበት።",
-              "የልደት ምዝገባ አገልግሎት ክፍያ 30 ዶላር ብቻ ነው።",
+              "የልደት ምዝገባ አገልግሎት ክፍያ {{amount}} ዶላር ብቻ ነው።",
             ],
           },
         ],
       },
       {
-        heading: "የጋብቻ ምዝገባ (Marriage) — $30",
+        heading: "የጋብቻ ምዝገባ (Marriage)",
+        feeKey: "marriage",
         blocks: [
           {
             type: "bullets",
@@ -677,13 +683,14 @@ export const consularPages: Record<string, ConsularPage> = {
               "ተጋቢው ስደተኛ ከሆነ የስደተኝነት እውቅና ያገኘ መሆን አለበት።",
               "ማንኛውም ጋብቻ በኢትዮጵያ/ በፌዴራል የቤተሰብ ህግ መሰረት ተፈጻሚ ይሆናል።",
               "በማንኛውም ስርዓት የሚፈፀም ጋብቻ ከዚህ በላይ የተዘረዘሩ ቅድመ ሁኔታዎችን ማሟላት አለበት።",
-              "የጋብቻ ምዝገባ አገልግሎት ክፍያ 30 ዶላር ብቻ ነው።",
+              "የጋብቻ ምዝገባ አገልግሎት ክፍያ {{amount}} ዶላር ብቻ ነው።",
             ],
           },
         ],
       },
       {
-        heading: "የፍቺ ምዝገባ (Divorce) — $30",
+        heading: "የፍቺ ምዝገባ (Divorce)",
+        feeKey: "divorce",
         blocks: [
           {
             type: "bullets",
@@ -694,13 +701,14 @@ export const consularPages: Record<string, ConsularPage> = {
               "ፍቺው በፍርድ ቤት የተከናወነ መሆኑን የሚገልፅ የፍርድ ቤት ውሳኔ ግልባጭ መቅረብ አለበት።",
               "ተፋቺዎች ፍቺውን ለማስመዝገብ ሲመጡ ጊዜው ያላለፈበት የመኖሪያ ፈቃድ ወይም ፓስፖርት ወይም ስደተኝነታቸውን የሚገልጽ ማስረጃ ማቅረብ አለባቸው።",
               "ቀደም ሲል የጋብቻ ምስክር ወረቀት የተሰጠ ከሆነ መመለስ አለበት።",
-              "የፍቺ ምዝገባ አገልግሎት ክፍያ 30 ዶላር ብቻ ነው።",
+              "የፍቺ ምዝገባ አገልግሎት ክፍያ {{amount}} ዶላር ብቻ ነው።",
             ],
           },
         ],
       },
       {
-        heading: "የሞት ምዝገባ (Death) — $20",
+        heading: "የሞት ምዝገባ (Death)",
+        feeKey: "death",
         blocks: [
           {
             type: "bullets",
@@ -710,7 +718,7 @@ export const consularPages: Record<string, ConsularPage> = {
               "የሞት አስመዝጋቢ ከሀገሩ መንግሥት የሞት ምስክር ወረቀት ይዞ መቅረብ አለበት።",
               "ሞቱ የሚመዘገበው በግለሰቡ መጥፋት ውሳኔ ምክንያት ከሆነ የፍርድ ቤት ውሳኔ ትክክለኛ ግልባጭ መቅረብ አለበት።",
               "ሞቱን የሚያስመዘግበው ፖሊስ ማንነቱን የሚገልጽ መታወቂያ/ማስረጃ ማቅረብ አለበት።",
-              "የሞት ምዝገባ አገልግሎት ክፍያ 20 ዶላር ብቻ ነው።",
+              "የሞት ምዝገባ አገልግሎት ክፍያ {{amount}} ዶላር ብቻ ነው።",
             ],
           },
           {

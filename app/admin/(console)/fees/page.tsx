@@ -30,8 +30,8 @@ export default async function AdminFeesPage() {
           Fees & content
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Edit service fees, office hours, and desk notes for visa documents,
-          TIN requests, and duty-free guidance.
+          Edit service fees (including Vital Events), office hours, and desk
+          notes for visa documents, TIN requests, and duty-free guidance.
         </p>
       </div>
 
