@@ -5,16 +5,20 @@ import { useLayoutEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { PRELOADER_STORAGE_KEY } from "@/lib/preloader";
 
-const LOGO_SRC = "/legacy-site/images/logo-uk-modified.png";
+const LOGO_SRC = "/images/logo-uk.png";
 const DURATION_MS = 1600;
 const EXIT_MS = 550;
+
+function setPreloaderState(state: "pending" | "skip") {
+  document.documentElement.dataset.preloader = state;
+}
 
 function shouldSkipPreloader(pathname: string): boolean {
   if (pathname.startsWith("/admin") || pathname.startsWith("/staff")) {
     return true;
   }
   if (typeof document !== "undefined") {
-    if (document.documentElement.classList.contains("preloader-skip")) {
+    if (document.documentElement.dataset.preloader === "skip") {
       return true;
     }
   }
@@ -34,14 +38,12 @@ export default function SitePreloader() {
 
   useLayoutEffect(() => {
     if (shouldSkipPreloader(pathname)) {
-      document.documentElement.classList.remove("preloader-pending");
-      document.documentElement.classList.add("preloader-skip");
+      setPreloaderState("skip");
       setVisible(false);
       return;
     }
 
-    document.documentElement.classList.add("preloader-pending");
-    document.documentElement.classList.remove("preloader-skip");
+    setPreloaderState("pending");
 
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -54,8 +56,7 @@ export default function SitePreloader() {
     const finish = () => {
       setExiting(true);
       exitTimer = window.setTimeout(() => {
-        document.documentElement.classList.remove("preloader-pending");
-        document.documentElement.classList.add("preloader-skip");
+        setPreloaderState("skip");
         setVisible(false);
         try {
           sessionStorage.setItem(PRELOADER_STORAGE_KEY, "1");

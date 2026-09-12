@@ -11,7 +11,7 @@ import { PRELOADER_STORAGE_KEY } from "@/lib/preloader";
 import { site } from "@/lib/content/site";
 import "./globals.css";
 
-const preloaderBoot = `(function(){try{var k=${JSON.stringify(PRELOADER_STORAGE_KEY)};var p=location.pathname||"";if(p.indexOf("/admin")===0||p.indexOf("/staff")===0){document.documentElement.classList.add("preloader-skip");return;}if(sessionStorage.getItem(k)==="1"){document.documentElement.classList.add("preloader-skip");}else{document.documentElement.classList.add("preloader-pending");}}catch(e){document.documentElement.classList.add("preloader-pending");}})();`;
+const preloaderBoot = `(function(){try{var k=${JSON.stringify(PRELOADER_STORAGE_KEY)};var p=location.pathname||"";var root=document.documentElement;if(p.indexOf("/admin")===0||p.indexOf("/staff")===0){root.dataset.preloader="skip";return;}if(sessionStorage.getItem(k)==="1"){root.dataset.preloader="skip";}else{root.dataset.preloader="pending";}}catch(e){document.documentElement.dataset.preloader="pending";}})();`;
 
 const display = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -56,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${display.variable} ${sans.variable} ${ethiopic.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col font-sans text-charcoal">
         <Script

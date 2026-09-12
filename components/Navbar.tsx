@@ -13,7 +13,10 @@ import {
 import HeaderSearch from "@/components/HeaderSearch";
 import { primaryNav, type NavItem } from "@/lib/content/navigation";
 
-const LOGO_SRC = "/legacy-site/images/logo-uk-modified.png";
+const LOGO_SRC = "/images/logo-uk.png";
+const BUILDING_SRC = "/images/london-ethio-building.jpg";
+const WORLD_MAP_SRC = "/images/world-map-header.jpg";
+const ETHIO_UK_SRC = "/images/ethio-uk-modified.png";
 
 const menuItems: NavItem[] = primaryNav.filter(
   (item) => item.label !== "Contact Us",
@@ -287,56 +290,105 @@ export default function Navbar() {
         scrolled ? "shadow-[0_12px_40px_rgba(7,21,40,0.35)]" : ""
       }`}
     >
-      {/* Tier 1 — London banner with logo on the right */}
+      {/* Tier 1 — world map brand bar (London photo banner removed) */}
       <div
         className={`relative w-full overflow-hidden bg-[#0B2545] transition-[height] duration-200 ease-out ${
           scrolled
-            ? "h-[4.75rem] sm:h-[5.25rem]"
-            : "h-[8rem] sm:h-[8.5rem]"
+            ? "h-[5.5rem] sm:h-[6.25rem]"
+            : "h-[8.75rem] sm:h-[9.75rem]"
         }`}
       >
-        {/* Mobile uses a left-cropped banner so branding reads larger; desktop keeps full art */}
-        <div className="absolute inset-y-0 left-0 right-[5.75rem] overflow-hidden sm:inset-0 sm:right-0">
+        <div className="absolute inset-0">
           <Image
-            src="/images/london-england-banner-mobile.jpg"
+            src={WORLD_MAP_SRC}
             alt=""
             fill
             priority
-            className="object-cover object-left sm:hidden"
-            sizes="(max-width: 639px) 100vw, 0px"
-          />
-          <Image
-            src="/images/london-england-banner.jpg"
-            alt=""
-            fill
-            priority
-            className="hidden object-cover object-center sm:block"
+            className="object-cover object-center"
             sizes="100vw"
           />
+          {/* Soft side fades only — keep map clearly visible in the centre */}
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-[#071528]/70 via-transparent to-[#071528]/55"
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-b from-[#0B2545]/25 via-transparent to-[#0B2545]/35"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 hidden w-[28%] opacity-[0.28] lg:block"
+            aria-hidden
+          >
+            <Image
+              src={BUILDING_SRC}
+              alt=""
+              fill
+              className="object-contain object-left-bottom"
+              sizes="28vw"
+            />
+          </div>
         </div>
-        <div className="relative z-10 flex h-full w-full items-center justify-end px-4 py-3 sm:px-8 sm:py-4 lg:px-12">
-          <Link href="/" className="ml-auto shrink-0" onClick={closeAll}>
-            <span
-              className={`relative inline-flex origin-right items-center justify-center p-1 transition-transform duration-200 ease-out will-change-transform sm:p-1.5 ${
-                scrolled ? "scale-[0.72]" : "scale-100"
-              }`}
-            >
-              <span
-                className="absolute inset-0 rounded-full bg-gradient-to-br from-[#dbbf8a] via-[#c5a572] to-[#8a7048] shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
-                aria-hidden
+
+        <div className="relative z-10 flex h-full w-full items-center justify-between gap-3 px-4 py-3 sm:px-8 sm:py-4 lg:px-12">
+          <Link
+            href="/"
+            className={`group flex min-w-0 items-center gap-3 origin-left transition-transform duration-200 ease-out will-change-transform sm:gap-4 ${
+              scrolled ? "scale-[0.94]" : "scale-100"
+            }`}
+            onClick={closeAll}
+          >
+            <span className="relative inline-flex shrink-0">
+              <Image
+                src={LOGO_SRC}
+                alt=""
+                width={270}
+                height={270}
+                priority
+                className={`h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] ${
+                  scrolled
+                    ? "w-12 sm:w-14"
+                    : "w-14 sm:w-16 md:w-[4.25rem]"
+                }`}
               />
-              <span className="relative overflow-hidden rounded-full bg-[#0B2545] p-1">
-                <Image
-                  src={LOGO_SRC}
-                  alt="Embassy of Ethiopia in London"
-                  width={220}
-                  height={220}
-                  priority
-                  className="h-auto w-[5rem] object-contain sm:w-[5.5rem] md:w-24"
+            </span>
+            <span className="min-w-0 text-left">
+              <span className="block font-display text-[12px] font-semibold leading-tight tracking-[0.08em] text-[#F5E6C8] uppercase sm:text-[14px] md:text-base md:tracking-[0.12em]">
+                Embassy Of Ethiopia
+              </span>
+              <span className="mt-1 flex items-center gap-2 sm:mt-1.5">
+                <span
+                  className="hidden h-px w-6 bg-gradient-to-r from-transparent to-[#c5a572]/80 sm:block"
+                  aria-hidden
+                />
+                <span className="font-display text-[11px] font-medium italic tracking-[0.32em] text-[#dbbf8a] uppercase sm:text-xs md:text-sm md:tracking-[0.4em]">
+                  London
+                </span>
+                <span
+                  className="hidden h-px w-6 bg-gradient-to-l from-transparent to-[#c5a572]/80 sm:block"
+                  aria-hidden
                 />
               </span>
             </span>
           </Link>
+
+          <div
+            className={`relative hidden shrink-0 origin-right transition-transform duration-200 ease-out will-change-transform sm:block ${
+              scrolled ? "scale-[0.94]" : "scale-100"
+            }`}
+          >
+            <Image
+              src={ETHIO_UK_SRC}
+              alt="Ethiopia and United Kingdom"
+              width={282}
+              height={282}
+              className={`h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] ${
+                scrolled
+                  ? "w-12 sm:w-14"
+                  : "w-14 sm:w-16 md:w-[4.25rem]"
+              }`}
+            />
+          </div>
         </div>
       </div>
 

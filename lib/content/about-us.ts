@@ -188,6 +188,26 @@ export const photoGallery: GalleryItem[] = [
     caption: "Rock-hewn churches of Lalibela",
   },
   {
+    src: "/legacy-site/images/hero-images/abbaa-jifar-palace-jima.jpg",
+    alt: "Palace of Abba Jifar II, Jimma",
+    caption: "Palace of Abba Jifar II, Jimma",
+  },
+  {
+    src: "/legacy-site/images/hero-images/kingdom-Aksum-Ethiopian.jpg",
+    alt: "Kingdom of Aksum obelisk",
+    caption: "Kingdom of Aksum — Obelisk of Aksum",
+  },
+  {
+    src: "/legacy-site/images/hero-images/ethiopian-airlines.jpg",
+    alt: "Ethiopian Airlines Cargo aircraft",
+    caption: "Ethiopian Airlines Cargo",
+  },
+  {
+    src: "/legacy-site/images/hero-images/ethiopian-airlines02.jpg",
+    alt: "Ethiopian Airlines cabin crew",
+    caption: "Ethiopian Airlines — known for its hospitality",
+  },
+  {
     src: "/images/about-ethiopia/addis-ababa-african-union.jpeg",
     alt: "African Union headquarters",
     caption: "African Union headquarters, Addis Ababa",

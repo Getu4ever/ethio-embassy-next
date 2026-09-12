@@ -4,10 +4,22 @@
  */
 export const assets = {
   logo: {
-    src: "/images/logo-uk-modified.png",
+    src: "/images/logo-uk.png",
+    width: 270,
+    height: 270,
+    alt: "Embassy of Ethiopia in London",
+  },
+  logoLockup: {
+    src: "/images/ethiopian-embassy-london-logo.png",
+    width: 1280,
+    height: 720,
+    alt: "Ethiopian Embassy London",
+  },
+  logoEthioUk: {
+    src: "/images/ethio-uk-modified.png",
     width: 282,
     height: 282,
-    alt: "Embassy of Ethiopia in London",
+    alt: "Ethiopia and United Kingdom",
   },
   logoThumb: {
     src: "/images/logo-uk-modified-150x150.png",

@@ -25,6 +25,34 @@ const GALLERY = [
     caption:
       "Dendi’s highland waterscape — natural heritage at the heart of Ethiopia’s highlands.",
   },
+  {
+    src: "/legacy-site/images/hero-images/abbaa-jifar-palace-jima.jpg",
+    title: "Palace of Abba Jifar II",
+    tag: "Heritage",
+    caption:
+      "Jimma’s historic royal palace — whitewashed walls, wooden verandas, and distinctive red roofs.",
+  },
+  {
+    src: "/legacy-site/images/hero-images/kingdom-Aksum-Ethiopian.jpg",
+    title: "Kingdom of Aksum",
+    tag: "Ancient History",
+    caption:
+      "The Obelisk of Aksum — a carved granite stele of one of Africa’s earliest civilisations.",
+  },
+  {
+    src: "/legacy-site/images/hero-images/ethiopian-airlines.jpg",
+    title: "Ethiopian Airlines Cargo",
+    tag: "Aviation",
+    caption:
+      "Ethiopian Cargo in flight — linking Africa to global trade through the national carrier.",
+  },
+  {
+    src: "/legacy-site/images/hero-images/ethiopian-airlines02.jpg",
+    title: "Ethiopian Airlines",
+    tag: "Aviation",
+    caption:
+      "Ethiopian Airlines is known for its hospitality — warm service that carries Ethiopian culture around the world.",
+  },
 ] as const;
 
 export default function InfrastructureGallery() {

@@ -221,15 +221,15 @@ p {
 }
 
 /* Hide homepage until the first-visit preloader finishes (set before paint). */
-html.preloader-pending {
+html[data-preloader="pending"] {
   overflow: hidden;
 }
 
-html.preloader-pending [data-site-chrome] {
+html[data-preloader="pending"] [data-site-chrome] {
   visibility: hidden;
 }
 
-html.preloader-skip .site-preloader {
+html[data-preloader="skip"] .site-preloader {
   display: none !important;
 }
 
