@@ -6,6 +6,7 @@ import {
   type BookingRequest,
 } from "@/lib/booking/types";
 import { contact } from "@/lib/content/site";
+import { renderBrandedEmail } from "@/lib/notify/email-layout";
 import { resolveDeskNotifyEmail } from "@/lib/notify/safe-email";
 
 function requireEnv(name: string): string {
@@ -30,30 +31,54 @@ export async function sendBookingEmails(input: {
   const serviceLabel = BOOKING_SERVICE_LABELS[input.booking.service];
   const whenLabel = `${input.booking.date} at ${input.booking.timeSlot} (${BOOKING_TIMEZONE}, ~${BOOKING_DURATION_MINUTES} mins)`;
   const { applicant } = input.booking;
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+    "https://ethioembassy.org.uk";
 
-  const staffHtml = `
-    <h2>New consular appointment request</h2>
-    <p><strong>Service:</strong> ${serviceLabel}</p>
-    <p><strong>When:</strong> ${whenLabel}</p>
-    <p><strong>Applicant:</strong> ${applicant.fullName}</p>
-    <p><strong>Email:</strong> ${applicant.email}</p>
-    <p><strong>Phone:</strong> ${applicant.phone}</p>
-    <p><strong>Passport / ID:</strong> ${applicant.passportNumber || "—"}</p>
-    <p><strong>Notes:</strong> ${applicant.notes || "—"}</p>
-    <p><strong>Google Calendar event:</strong> ${input.eventId}</p>
-    ${input.htmlLink ? `<p><a href="${input.htmlLink}">Open in Google Calendar</a></p>` : ""}
-  `;
+  const staffHtml = renderBrandedEmail({
+    variant: "staff",
+    title: "New consular appointment request",
+    intro: [
+      "A new appointment request has been submitted through the Embassy website.",
+    ],
+    detailsLabel: "Appointment details",
+    details: [
+      { label: "Service", value: serviceLabel },
+      { label: "When", value: whenLabel },
+      { label: "Applicant", value: applicant.fullName },
+      { label: "Email", value: applicant.email },
+      { label: "Phone", value: applicant.phone },
+      { label: "Passport / ID", value: applicant.passportNumber || "—" },
+      { label: "Notes", value: applicant.notes || "—" },
+      { label: "Calendar event", value: input.eventId },
+    ],
+    cta: input.htmlLink
+      ? { label: "Open in Google Calendar", href: input.htmlLink }
+      : { label: "Open admin appointments", href: `${origin}/admin/appointments` },
+  });
 
-  const applicantHtml = `
-    <h2>Appointment request received</h2>
-    <p>Dear ${applicant.fullName},</p>
-    <p>Thank you for booking with the Embassy of Ethiopia in London.</p>
-    <p><strong>Service:</strong> ${serviceLabel}</p>
-    <p><strong>Requested time:</strong> ${whenLabel}</p>
-    <p><strong>Location:</strong> 17 Princes Gate, London SW7 1PZ</p>
-    <p>Please bring all required documents for your service. If you need to change or cancel, contact us at ${publicContact}.</p>
-    <p>Embassy of Ethiopia · London</p>
-  `;
+  const applicantHtml = renderBrandedEmail({
+    variant: "applicant",
+    title: "Appointment request received",
+    greeting: `Dear ${applicant.fullName},`,
+    intro: [
+      "Thank you for booking with the Embassy of Ethiopia in London. We have received your appointment request for the service below.",
+    ],
+    detailsLabel: "Appointment details",
+    details: [
+      { label: "Service", value: serviceLabel },
+      { label: "Requested time", value: whenLabel },
+      { label: "Location", value: contact.address },
+    ],
+    closing: [
+      "Please bring all required documents for your service. If you need to change or cancel, contact us and quote your requested date and time.",
+      `Questions? Email ${publicContact} or call ${contact.phoneDisplay}.`,
+    ],
+    cta: {
+      label: "Visit Embassy website",
+      href: origin,
+    },
+  });
 
   let staffEmailId: string | null = null;
   if (notify) {
