@@ -205,7 +205,8 @@ export const photoGallery: GalleryItem[] = [
   {
     src: "/legacy-site/images/hero-images/ethiopian-airlines02.jpg",
     alt: "Ethiopian Airlines cabin crew",
-    caption: "Ethiopian Airlines — known for its hospitality",
+    caption:
+      "Ethiopian Airlines is Africa's largest airline in terms of passengers carried, destinations served, fleet size, and revenue.",
   },
   {
     src: "/images/about-ethiopia/addis-ababa-african-union.jpeg",

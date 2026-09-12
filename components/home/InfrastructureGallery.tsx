@@ -51,7 +51,7 @@ const GALLERY = [
     title: "Ethiopian Airlines",
     tag: "Aviation",
     caption:
-      "Ethiopian Airlines is known for its hospitality — warm service that carries Ethiopian culture around the world.",
+      "Ethiopian Airlines is Africa's largest airline in terms of passengers carried, destinations served, fleet size, and revenue.",
   },
 ] as const;
 

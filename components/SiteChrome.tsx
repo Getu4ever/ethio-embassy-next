@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 import type { OfficeHoursContent } from "@/lib/cms/types";
 import type { ReactNode } from "react";
 
@@ -29,6 +30,7 @@ export default function SiteChrome({
       <Navbar />
       <div className="flex-1">{children}</div>
       <Footer officeHours={officeHours} />
+      <CookieConsentBanner />
     </div>
   );
 }

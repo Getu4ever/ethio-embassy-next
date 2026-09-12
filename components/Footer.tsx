@@ -168,6 +168,9 @@ export default function Footer({
             <Link href="/contact-us" className="hover:text-gold">
               Contact Us
             </Link>
+            <Link href="/cookie-policy" className="hover:text-gold">
+              Cookie Policy
+            </Link>
           </div>
         </div>
       </div>
