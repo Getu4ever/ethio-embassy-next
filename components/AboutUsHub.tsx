@@ -80,15 +80,19 @@ export default function AboutUsHub() {
       </section>
 
       {/* Leadership portraits */}
-      <section className="bg-canvas">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="relative overflow-hidden bg-canvas">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(197,165,114,0.08),transparent_55%)]"
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">
             Leadership
           </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-navy sm:text-4xl">
             Diplomatic staff
           </h2>
-          <ul className="mt-12 grid gap-10 sm:grid-cols-2">
+          <ul className="mt-14 grid gap-12 sm:grid-cols-2 sm:gap-10 lg:gap-16">
             {diplomaticStaff.map((person) => (
               <li key={person.name} className="group">
                 <Link
@@ -99,19 +103,44 @@ export default function AboutUsHub() {
                   }
                   className="block"
                 >
-                  <div className="relative mx-auto aspect-square max-w-xs overflow-hidden rounded-full ring-2 ring-gold/60 ring-offset-4 ring-offset-canvas sm:mx-0">
-                    <Image
-                      src={person.image.src}
-                      alt={person.image.alt}
-                      fill
-                      className="object-cover object-top transition duration-700 group-hover:scale-[1.03]"
-                      sizes="320px"
+                  <div className="relative mx-auto aspect-square w-full max-w-[17.5rem] sm:mx-0 sm:max-w-[19rem]">
+                    {/* Soft champagne aura */}
+                    <div
+                      className="absolute -inset-4 rounded-full bg-[radial-gradient(circle,rgba(197,165,114,0.32)_0%,transparent_70%)] opacity-80 transition duration-500 group-hover:opacity-100 group-hover:scale-[1.02]"
+                      aria-hidden
                     />
+                    {/* Dual metallic gold rings */}
+                    <div
+                      className="absolute inset-0 rounded-full bg-gradient-to-br from-[#f0e0bc] via-[#c5a572] to-[#8a7048] p-[2.5px] shadow-[0_20px_44px_rgba(11,37,69,0.16)] transition duration-500 group-hover:-translate-y-0.5 group-hover:shadow-[0_28px_56px_rgba(11,37,69,0.22)]"
+                      aria-hidden
+                    >
+                      <div className="h-full w-full rounded-full bg-canvas p-[6px]">
+                        <div className="h-full w-full rounded-full bg-gradient-to-br from-[#e8d5a8] via-[#c5a572] to-[#7a6240] p-[1.5px]">
+                          <div className="relative h-full w-full overflow-hidden rounded-full bg-navy/5">
+                            <Image
+                              src={person.image.src}
+                              alt={person.image.alt}
+                              fill
+                              className="object-cover object-top transition duration-700 group-hover:scale-[1.05]"
+                              sizes="(max-width: 640px) 70vw, 304px"
+                            />
+                            <div
+                              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,transparent_45%,rgba(7,21,40,0.28)_100%)]"
+                              aria-hidden
+                            />
+                            <div
+                              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy-deep/30 via-transparent to-white/15"
+                              aria-hidden
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+                  <p className="mt-8 text-xs font-semibold uppercase tracking-[0.18em] text-gold">
                     {person.role}
                   </p>
-                  <h3 className="mt-2 font-display text-2xl font-semibold text-navy">
+                  <h3 className="mt-2 font-display text-2xl font-semibold text-navy transition group-hover:text-navy-deep">
                     {person.name}
                   </h3>
                   <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">

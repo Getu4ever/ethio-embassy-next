@@ -38,6 +38,37 @@ export default function Footer() {
                 </a>
               </p>
             </div>
+
+            <div className="mt-8">
+              <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
+                Follow Us
+              </p>
+              <a
+                href="https://x.com/ETEmbassyLDN"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow the Embassy of Ethiopia in London on X"
+                className="group mt-3 inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-3.5 py-2.5 transition duration-300 hover:border-gold/50 hover:bg-gold/10"
+              >
+                <span className="flex h-8 w-8 items-center justify-center border border-gold/35 bg-navy-deep text-gold transition duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-navy-deep">
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    className="h-3.5 w-3.5 fill-current"
+                  >
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
+                  </svg>
+                </span>
+                <span className="pr-1">
+                  <span className="block text-sm font-medium text-white transition group-hover:text-gold">
+                    @ETEmbassyLDN
+                  </span>
+                  <span className="mt-0.5 block text-[11px] tracking-wide text-white/45 transition group-hover:text-white/65">
+                    Official updates on X
+                  </span>
+                </span>
+              </a>
+            </div>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-2">
