@@ -10,7 +10,7 @@ import { contact } from "@/lib/content/site";
 export default function AboutUsHub() {
   return (
     <main className="bg-canvas">
-      <section className="relative isolate min-h-[88vh] overflow-hidden text-white sm:min-h-[92vh]">
+      <section className="relative isolate min-h-[58vh] overflow-hidden text-white sm:min-h-[64vh]">
         <Image
           src="/images/about-us/embassy-building.jpg"
           alt="Embassy of Ethiopia building in London"
@@ -19,30 +19,30 @@ export default function AboutUsHub() {
           sizes="100vw"
           className="animate-soft-pan object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-deep via-navy-deep/80 to-navy/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-transparent to-navy-deep/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/70 to-navy/30" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_20%,rgba(197,165,114,0.2),transparent_45%)]" />
 
-        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-4 pb-16 pt-28 sm:min-h-[92vh] sm:px-6 sm:pb-20 lg:px-8">
-          <p className="animate-fade-up font-display text-sm font-semibold uppercase tracking-[0.28em] text-gold sm:text-base">
-            Embassy of Ethiopia · London
+        <div className="relative mx-auto flex min-h-[58vh] max-w-7xl flex-col justify-end px-4 pb-10 pt-28 sm:min-h-[64vh] sm:px-6 sm:pb-12 lg:px-8">
+          <p className="animate-fade-up text-xs font-semibold uppercase tracking-[0.24em] text-gold">
+            About Us
           </p>
-          <h1 className="animate-fade-up-delay mt-5 max-w-3xl font-display text-5xl font-semibold tracking-tight sm:text-6xl md:text-7xl">
+          <h1 className="animate-fade-up-delay mt-4 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             About Us
           </h1>
-          <p className="animate-fade-up-delay mt-6 max-w-lg text-base leading-relaxed text-white/85 sm:text-lg">
+          <p className="animate-fade-up-delay mt-5 max-w-lg text-base leading-relaxed text-white/85 sm:text-lg">
             Ethiopia’s mission in the United Kingdom — diplomacy, consular care,
             and partnership from Princes Gate.
           </p>
-          <div className="animate-fade-up-delay mt-10 flex flex-wrap gap-3">
+          <div className="animate-fade-up-delay mt-8 flex flex-wrap gap-3">
             <Link
               href="/the-ambassador"
-              className="inline-flex bg-gold px-6 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-navy-deep transition hover:bg-gold-bright"
+              className="inline-flex bg-gold px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-navy-deep transition hover:bg-gold-bright"
             >
               Meet the Ambassador
             </Link>
             <Link
               href="/the-embassy"
-              className="inline-flex border border-white/40 px-6 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-white transition hover:border-gold hover:text-gold"
+              className="inline-flex border border-white/35 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-white transition hover:border-gold hover:text-gold"
             >
               The Embassy
             </Link>
