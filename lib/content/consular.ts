@@ -767,8 +767,8 @@ export const consularHubServices: {
     summary:
       "Ethiopian Origin ID Card for diaspora nationals reconnecting with Ethiopia.",
     hero: {
-      src: "/images/about-ethiopia/ethio-origin.jpg",
-      alt: "Ethiopian Origin ID Card",
+      src: "/images/about-ethiopia/yellow-card-ethiopian-origin.jpg",
+      alt: "Historic Ethiopian Airlines building in Addis Ababa",
     },
   },
   {
