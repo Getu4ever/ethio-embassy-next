@@ -41,7 +41,7 @@ export const ambassadorWelcome = {
   role: "Ambassador Extraordinary and Plenipotentiary",
   ctaLabel: "Meet the Ambassador",
   ctaHref: "/the-ambassador",
-  logo: assets.logo,
+  logo: assets.logoEthioUk,
 } as const;
 
 export const leadership = [

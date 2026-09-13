@@ -82,8 +82,8 @@ export function HomeTop() {
                 />
                 <div className="relative overflow-hidden rounded-full bg-[#0B2545] p-1.5">
                   <Image
-                    src={ambassadorWelcome.logo.src}
-                    alt={ambassadorWelcome.logo.alt}
+                    src={assets.logoEthioUk.src}
+                    alt={assets.logoEthioUk.alt}
                     width={140}
                     height={140}
                     className="h-auto w-[5.5rem] object-contain sm:w-24"

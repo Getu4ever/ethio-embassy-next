@@ -373,7 +373,7 @@ export default function Navbar() {
           </Link>
 
           <div
-            className={`relative hidden shrink-0 origin-right transition-transform duration-200 ease-out will-change-transform sm:block ${
+            className={`relative shrink-0 origin-right transition-transform duration-200 ease-out will-change-transform ${
               scrolled ? "scale-[0.94]" : "scale-100"
             }`}
           >
