@@ -158,8 +158,8 @@ export const consularPages: Record<string, ConsularPage> = {
     lede:
       "If you wish to apply, renew or replace your Ethiopian passport, please read the following information carefully.",
     hero: {
-      src: "/images/consular/passport.jpg",
-      alt: "Passport booklets for passport services",
+      src: "/images/consular/passport-hero-modern.jpg",
+      alt: "Ethiopian passport on a desk at the Embassy of Ethiopia in London",
       position: "object-center",
     },
     showStripe: false,
@@ -757,8 +757,8 @@ export const consularHubServices: {
     summary:
       "Renewal, children born abroad, lost passport, and corrections — with full document checklists.",
     hero: {
-      src: "/images/consular/passport.jpg",
-      alt: "Passport booklets for passport services",
+      src: "/images/consular/passport-hero-modern.jpg",
+      alt: "Ethiopian passport on a desk at the Embassy of Ethiopia in London",
     },
   },
   {

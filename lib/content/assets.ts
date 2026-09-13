@@ -76,10 +76,10 @@ export const assets = {
     alt: "Consular announcement — ማስታወቂያ",
   },
   consularAnnouncementHero: {
-    src: "/images/news/consular-announcement-hero.jpg",
+    src: "/images/news/consular-announcement-hero-modern.jpg",
     width: 1376,
     height: 768,
-    alt: "Consular services desk at the Embassy of Ethiopia in London",
+    alt: "Ethiopian passport on a desk at the Embassy of Ethiopia in London",
   },
   newsIndexHero: {
     src: "/images/news/news-index-hero.jpg",

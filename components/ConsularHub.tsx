@@ -11,8 +11,8 @@ export default function ConsularHub() {
     <main className="bg-canvas">
       <section className="relative isolate min-h-[58vh] overflow-hidden text-white sm:min-h-[64vh]">
         <Image
-          src="/images/consular/passport.jpg"
-          alt="Consular documents and travel credentials"
+          src="/images/consular/passport-hero-modern.jpg"
+          alt="Ethiopian passport for consular services"
           fill
           priority
           sizes="100vw"
