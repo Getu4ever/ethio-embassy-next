@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import FacebookVideoEmbed from "@/components/FacebookVideoEmbed";
 import NewsImageCarousel from "@/components/NewsImageCarousel";
 import NewsShareBar from "@/components/NewsShareBar";
 import {
@@ -89,6 +90,9 @@ function Block({ block }: { block: NewsBlock }) {
         />
       );
     case "video":
+      if (block.provider === "facebook") {
+        return <FacebookVideoEmbed url={block.src} caption={block.caption} />;
+      }
       return (
         <figure className="overflow-hidden border border-line bg-navy">
           <video
@@ -101,11 +105,21 @@ function Block({ block }: { block: NewsBlock }) {
             <source src={block.src} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
-          {block.caption ? (
-            <figcaption className="border-t border-line bg-white px-4 py-3 text-sm text-muted sm:px-5">
-              {block.caption}
-            </figcaption>
-          ) : null}
+          <div className="border-t border-line bg-white px-4 py-3 sm:px-5">
+            {block.caption ? (
+              <p className="text-sm text-muted">{block.caption}</p>
+            ) : null}
+            {block.externalUrl ? (
+              <a
+                href={block.externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex text-xs font-semibold uppercase tracking-[0.14em] text-navy transition hover:text-emerald"
+              >
+                {block.externalLabel || "Open original →"}
+              </a>
+            ) : null}
+          </div>
         </figure>
       );
   }

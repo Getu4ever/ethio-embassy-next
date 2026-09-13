@@ -19,6 +19,11 @@ export type NewsBlock =
       src: string;
       poster?: string;
       caption?: string;
+      /** Hosted file by default; facebook uses an embed iframe */
+      provider?: "file" | "facebook";
+      /** Optional outbound link (e.g. original Facebook reel) */
+      externalUrl?: string;
+      externalLabel?: string;
     };
 
 export type NewsArticle = NewsItem & {
@@ -81,16 +86,12 @@ export const newsArticles: NewsArticle[] = [
       },
       {
         type: "video",
-        src: "/images/news/x-posts/new-year.mp4",
+        src: "https://github.com/Getu4ever/ethio-embassy-next/releases/download/media-ethiopian-new-year-2026/new-year-facebook-web.mp4",
         poster: assets.newsEthiopianNewYear.src,
         caption:
           "New Year message from H.E. Ambassador Biruk Mekonnen and Embassy staff",
-      },
-      {
-        type: "image",
-        src: assets.newsEthiopianNewYearCard.src,
-        alt: assets.newsEthiopianNewYearCard.alt,
-        caption: "መልካም አዲስ ዓመት — Ethiopian New Year 2019 greetings",
+        externalUrl: "https://www.facebook.com/reel/1060014623613371",
+        externalLabel: "Watch on Facebook →",
       },
     ],
   },
