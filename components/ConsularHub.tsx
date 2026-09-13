@@ -101,7 +101,9 @@ export default function ConsularHub() {
                   alt={service.hero.alt}
                   fill
                   sizes="100vw"
-                  className="object-cover transition duration-700 group-hover:scale-[1.04]"
+                  className={`object-cover transition duration-700 group-hover:scale-[1.04] ${
+                    service.hero.position ?? "object-center"
+                  }`}
                 />
                 <div
                   className={`absolute inset-0 ${

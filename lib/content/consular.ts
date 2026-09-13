@@ -739,7 +739,7 @@ export const consularHubServices: {
   href: string;
   label: string;
   summary: string;
-  hero: { src: string; alt: string };
+  hero: { src: string; alt: string; position?: string };
 }[] = [
   {
     href: "/visa-services",
@@ -767,8 +767,9 @@ export const consularHubServices: {
     summary:
       "Ethiopian Origin ID Card for diaspora nationals reconnecting with Ethiopia.",
     hero: {
-      src: "/images/about-ethiopia/yellow-card-ethiopian-origin.jpg",
-      alt: "Historic Ethiopian Airlines building in Addis Ababa",
+      src: "/images/consular/yellow-card.jpg",
+      alt: "Ethiopian Origin ID Card (Yellow Card) documents on a diplomatic desk",
+      position: "object-center",
     },
   },
   {

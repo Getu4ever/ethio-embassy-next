@@ -93,10 +93,9 @@ export const aboutEthiopiaHeroes: Record<
     summary: "How the London mission represents Ethiopia in the United Kingdom.",
   },
   "/yellow-card": {
-    src: "/images/about-ethiopia/yellow-card-ethiopian-origin.jpg",
-    alt: "Historic Ethiopian Airlines building in Addis Ababa",
-    // Mobile crop stays mid; desktop bias toward the roofline so the sign isn't clipped
-    position: "object-[50%_42%] lg:object-[50%_22%]",
+    src: "/images/consular/yellow-card.jpg",
+    alt: "Ethiopian Origin ID Card (Yellow Card) documents on a diplomatic desk",
+    position: "object-center",
     summary: "Identity and connection for foreign nationals of Ethiopian origin.",
   },
   "/diaspora-policy": {
