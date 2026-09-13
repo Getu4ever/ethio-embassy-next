@@ -11,16 +11,16 @@ const HERO_SLIDES = [
     alt: "Rock-hewn churches of Lalibela, Ethiopia",
   },
   {
-    src: "/legacy-site/images/hero-images/sofomar.jpg",
-    alt: "Sof Omar caves landscape, Ethiopia",
+    src: "/legacy-site/images/hero-images/ancient-standing-stones.jpg",
+    alt: "Ancient standing stones in Ethiopia",
   },
   {
-    src: "/legacy-site/images/hero-images/BaleMountain.jpg",
-    alt: "Bale Mountains, Ethiopia",
+    src: "/legacy-site/images/hero-images/addis-ababa-african-union.jpg",
+    alt: "African Union headquarters in Addis Ababa",
   },
   {
-    src: "/legacy-site/images/hero-images/3Terara.jpg",
-    alt: "Ethiopian highland scenery",
+    src: "/legacy-site/images/hero-images/london-city-01.jpeg",
+    alt: "London city skyline",
   },
 ] as const;
 
