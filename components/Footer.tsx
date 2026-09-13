@@ -5,7 +5,36 @@ import {
   importantLinks,
 } from "@/lib/content/navigation";
 import type { OfficeHoursContent } from "@/lib/cms/types";
-import { contact, site } from "@/lib/content/site";
+import { contact, site, socialLinks } from "@/lib/content/site";
+
+function SocialIcon({ id }: { id: (typeof socialLinks)[number]["id"] }) {
+  switch (id) {
+    case "x":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-current">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
+        </svg>
+      );
+    case "facebook":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-current">
+          <path d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.02 3.66 9.18 8.44 9.93v-7.02H7.9v-2.91h2.4V9.84c0-2.37 1.4-3.69 3.56-3.69 1.03 0 2.12.19 2.12.19v2.34h-1.2c-1.18 0-1.55.74-1.55 1.49v1.78h2.64l-.42 2.91h-2.22V22c4.78-.75 8.44-4.91 8.44-9.93z" />
+        </svg>
+      );
+    case "linkedin":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-current">
+          <path d="M6.94 8.5H3.56V20h3.38V8.5zM5.25 7.05c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM20.44 20h-3.37v-5.6c0-1.33-.02-3.05-1.86-3.05-1.86 0-2.14 1.45-2.14 2.95V20h-3.37V8.5h3.23v1.57h.05c.45-.85 1.55-1.75 3.19-1.75 3.41 0 4.04 2.25 4.04 5.17V20z" />
+        </svg>
+      );
+    case "youtube":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-current">
+          <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.2 3.5-6.2 3.5z" />
+        </svg>
+      );
+  }
+}
 
 export default function Footer({
   officeHours = contact.officeHours,
@@ -48,31 +77,25 @@ export default function Footer({
               <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
                 Follow Us
               </p>
-              <a
-                href="https://x.com/ETEmbassyLDN"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Follow the Embassy of Ethiopia in London on X"
-                className="group mt-3 inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-3.5 py-2.5 transition duration-300 hover:border-gold/50 hover:bg-gold/10"
-              >
-                <span className="flex h-8 w-8 items-center justify-center border border-gold/35 bg-navy-deep text-gold transition duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-navy-deep">
-                  <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    className="h-3.5 w-3.5 fill-current"
-                  >
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
-                  </svg>
-                </span>
-                <span className="pr-1">
-                  <span className="block text-sm font-medium text-white transition group-hover:text-gold">
-                    @ETEmbassyLDN
-                  </span>
-                  <span className="mt-0.5 block text-[11px] tracking-wide text-white/45 transition group-hover:text-white/65">
-                    Official updates on X
-                  </span>
-                </span>
-              </a>
+              <ul className="mt-4 flex flex-wrap gap-2.5">
+                {socialLinks.map((link) => (
+                  <li key={link.id}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.ariaLabel}
+                      title={link.label}
+                      className="group flex h-11 w-11 items-center justify-center border border-white/15 bg-white/[0.03] text-gold transition duration-300 hover:border-gold hover:bg-gold hover:text-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                    >
+                      <SocialIcon id={link.id} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-[11px] tracking-wide text-white/40">
+                X · Facebook · LinkedIn · YouTube
+              </p>
             </div>
           </div>
 

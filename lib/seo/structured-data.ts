@@ -17,7 +17,13 @@ export function organizationJsonLd() {
     email: contact.email,
     telephone: contact.phoneDisplay,
     priceRange: "$$",
-    sameAs: [site.twitter, "https://x.com/ETEmbassyLDN"],
+    sameAs: [
+      site.twitter,
+      "https://x.com/ETEmbassyLDN",
+      site.facebook,
+      site.linkedin,
+      site.youtube,
+    ],
     address: {
       "@type": "PostalAddress",
       streetAddress: "17 Princes Gate",

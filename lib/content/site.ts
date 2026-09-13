@@ -8,8 +8,38 @@ export const site = {
   url: "https://ethioembassy.org.uk",
   twitter: "https://twitter.com/ETEmbassyLDN",
   twitterHandle: "@ETEmbassyLDN",
+  facebook: "https://www.facebook.com/EthioEmbassyUK/",
+  linkedin: "https://www.linkedin.com/company/ethiopian-embassy-london/",
+  youtube: "https://www.youtube.com/channel/UCYgIy3aE3FpDY22Qg9YWhgQ",
   weekInTheHornUrl: "https://mfaethiopiablog.wordpress.com/",
 } as const;
+
+export const socialLinks = [
+  {
+    id: "x",
+    label: "X",
+    href: "https://x.com/ETEmbassyLDN",
+    ariaLabel: "Follow the Embassy of Ethiopia in London on X",
+  },
+  {
+    id: "facebook",
+    label: "Facebook",
+    href: site.facebook,
+    ariaLabel: "Follow the Embassy of Ethiopia in London on Facebook",
+  },
+  {
+    id: "linkedin",
+    label: "LinkedIn",
+    href: site.linkedin,
+    ariaLabel: "Follow the Embassy of Ethiopia in London on LinkedIn",
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    href: site.youtube,
+    ariaLabel: "Watch the Embassy of Ethiopia in London on YouTube",
+  },
+] as const;
 
 export const contact = {
   address: "17 Princes Gate, London SW7 1PZ",
