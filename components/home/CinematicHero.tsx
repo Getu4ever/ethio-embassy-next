@@ -17,8 +17,6 @@ const HERO_SLIDES = [
   {
     src: "/legacy-site/images/hero-images/addis-ababa-african-union.jpg",
     alt: "African Union headquarters in Addis Ababa",
-    // Pale silver architecture vs sky — keep silhouette readable under hero overlays
-    imageClass: "contrast-125 saturate-110 brightness-[1.02]",
   },
   {
     src: "/legacy-site/images/hero-images/london-city-01.jpeg",
@@ -66,7 +64,7 @@ export default function CinematicHero() {
               priority={i === 0}
               className={`object-cover object-center will-change-transform ${
                 active ? "carousel-kenburns" : "scale-110"
-              } ${"imageClass" in slide ? slide.imageClass : ""}`}
+              }`}
               sizes="100vw"
             />
           </div>
