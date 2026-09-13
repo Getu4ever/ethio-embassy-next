@@ -228,10 +228,14 @@ export function NewsSection() {
           className="group relative min-h-[22rem] overflow-hidden bg-navy sm:min-h-[28rem] lg:col-span-7"
         >
           <Image
-            src={newsItems[0].image.src}
+            src={
+              newsItems[0].slug === "zamzam-bank-islamic-finance-award"
+                ? "/images/news/x-posts/zamzam-1-featured.jpg"
+                : newsItems[0].image.src
+            }
             alt={newsItems[0].image.alt}
             fill
-            className="object-cover transition duration-700 group-hover:scale-105"
+            className="object-cover object-center transition duration-700 group-hover:scale-105"
             sizes="(max-width: 1024px) 100vw, 58vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy/40 to-transparent" />

@@ -78,22 +78,46 @@ export type NewsItem = {
 export const latestTicker: { title: string; href: string }[] = [
   {
     title:
+      "Ambassador Lalisa Birhanu receives ZamZam Bank Global Islamic Finance Award",
+    href: "/news/zamzam-bank-islamic-finance-award",
+  },
+  {
+    title:
+      "Happy Ethiopian New Year greetings from Ambassador Biruk Mekonnen",
+    href: "/news/ethiopian-new-year-2026",
+  },
+  {
+    title:
       "Embassy of Ethiopia Welcomes Future Scholars from UK Universities",
     href: "/news/embassy-welcomes-future-scholars",
-  },
-  {
-    title:
-      "Embassy visits Kagool’s Birmingham office for investment dialogue",
-    href: "/news/kagool-birmingham-visit",
-  },
-  {
-    title:
-      "H.E. Ambassador Biruk Mekonnen Presents his Credential to IMO Secretary-General",
-    href: "/news/ambassador-credentials-imo",
   },
 ];
 
 export const newsItems: NewsItem[] = [
+  {
+    slug: "zamzam-bank-islamic-finance-award",
+    title:
+      "Ambassador Lalisa Birhanu receives ZamZam Bank Global Islamic Finance Award",
+    excerpt:
+      "Deputy Head of Mission H.E. Ambassador Lalisa Birhanu received ZamZam Bank’s 2026 Global Islamic Finance Award for Islamic Banking in London.",
+    date: "2026-09-10",
+    dateLabel: "September 10, 2026",
+    category: "News",
+    image: assets.newsZamzamAward,
+    author: "Embassy of Ethiopia in London",
+  },
+  {
+    slug: "ethiopian-new-year-2026",
+    title:
+      "Happy Ethiopian New Year greetings from Ambassador Biruk Mekonnen",
+    excerpt:
+      "H.E. Ambassador Biruk Mekonnen and Embassy staff extend warmest wishes for a joyful and prosperous Ethiopian New Year.",
+    date: "2026-09-10",
+    dateLabel: "September 10, 2026",
+    category: "Announcements",
+    image: assets.newsEthiopianNewYear,
+    author: "Embassy of Ethiopia in London",
+  },
   {
     slug: "embassy-welcomes-future-scholars",
     title:

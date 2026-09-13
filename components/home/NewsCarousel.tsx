@@ -7,11 +7,18 @@ import { newsItems } from "@/lib/content/site";
 
 const PREFERRED_FIRST = "ambassador-credentials-imo";
 
+/** Keep these on /news only — not the homepage carousel. */
+const CAROUSEL_EXCLUDED = new Set([
+  "consular-announcement",
+  "ethiopian-new-year-2026",
+  "zamzam-bank-islamic-finance-award",
+]);
+
 const slides = [
   ...newsItems.filter((item) => item.slug === PREFERRED_FIRST),
   ...newsItems.filter(
     (item) =>
-      item.slug !== PREFERRED_FIRST && item.slug !== "consular-announcement",
+      item.slug !== PREFERRED_FIRST && !CAROUSEL_EXCLUDED.has(item.slug),
   ),
 ];
 

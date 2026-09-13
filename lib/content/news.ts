@@ -13,7 +13,13 @@ export type NewsBlock =
       /** Full A4 / letter notice — show complete page without cropping */
       presentation?: "photo" | "document";
     }
-  | { type: "gallery"; images: { src: string; alt: string }[] };
+  | { type: "gallery"; images: { src: string; alt: string }[] }
+  | {
+      type: "video";
+      src: string;
+      poster?: string;
+      caption?: string;
+    };
 
 export type NewsArticle = NewsItem & {
   sourceUrl: string;
@@ -30,6 +36,64 @@ function base(slug: string): NewsItem {
 }
 
 export const newsArticles: NewsArticle[] = [
+  {
+    ...base("zamzam-bank-islamic-finance-award"),
+    sourceUrl: "https://x.com/ETEmbassyLDN/status/2097975677056061493",
+    lede:
+      "Deputy Head of the Ethiopian Embassy in London, H.E. Ambassador Lalisa Birhanu, received ZamZam Bank’s 2026 Global Islamic Finance Award for Islamic Banking on behalf of the institution in London on 8 September 2026.",
+    blocks: [
+      {
+        type: "paragraph",
+        text: "Deputy Head of the Ethiopian Embassy in London, H.E. Ambassador Lalisa Birhanu, received ZamZam Bank’s 2026 Global Islamic Finance Award for Islamic Banking on behalf of the institution in London on 8 September 2026. The award acknowledges the bank’s continued efforts in Islamic banking, including its focus on resilience, consistency, and ethical financial practices. The recognition also reflects ZamZam Bank’s growing engagement with the international Islamic finance sector and its contribution to Ethiopia’s visibility within the global financial community.",
+      },
+      {
+        type: "gallery",
+        images: [
+          {
+            src: "/images/news/x-posts/zamzam-1.jpg",
+            alt: "Ambassador Lalisa Birhanu with the ZamZam Bank award",
+          },
+          {
+            src: "/images/news/x-posts/zamzam-2.jpg",
+            alt: "ZamZam Bank 2026 Global Islamic Finance Award ceremony in London",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    ...base("ethiopian-new-year-2026"),
+    sourceUrl: "https://x.com/ETEmbassyLDN/status/2098036068100538879",
+    lede:
+      "His Excellency Ambassador Biruk Mekonnen and the staff of the Embassy of Ethiopia in London extend their warmest wishes for a joyful and prosperous Ethiopian New Year.",
+    blocks: [
+      {
+        type: "paragraph",
+        text: "እንኳን አደረሳችሁ! Happy New Year!",
+      },
+      {
+        type: "paragraph",
+        text: "His Excellency Ambassador Biruk Mekonnen and the staff of the Embassy of Ethiopia in London extend their warmest wishes to you and your loved ones for a joyful and prosperous Ethiopian New Year.",
+      },
+      {
+        type: "paragraph",
+        text: "May the new year bring renewed hope, happiness, and countless moments of celebration, and may it strengthen the bonds of friendship and unity we cherish.",
+      },
+      {
+        type: "video",
+        src: "/images/news/x-posts/new-year.mp4",
+        poster: assets.newsEthiopianNewYear.src,
+        caption:
+          "New Year message from H.E. Ambassador Biruk Mekonnen and Embassy staff",
+      },
+      {
+        type: "image",
+        src: assets.newsEthiopianNewYearCard.src,
+        alt: assets.newsEthiopianNewYearCard.alt,
+        caption: "መልካም አዲስ ዓመት — Ethiopian New Year 2019 greetings",
+      },
+    ],
+  },
   {
     ...base("embassy-welcomes-future-scholars"),
     sourceUrl:

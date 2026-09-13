@@ -88,6 +88,26 @@ function Block({ block }: { block: NewsBlock }) {
           }))}
         />
       );
+    case "video":
+      return (
+        <figure className="overflow-hidden border border-line bg-navy">
+          <video
+            controls
+            playsInline
+            preload="metadata"
+            poster={block.poster}
+            className="aspect-video w-full bg-navy"
+          >
+            <source src={block.src} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          {block.caption ? (
+            <figcaption className="border-t border-line bg-white px-4 py-3 text-sm text-muted sm:px-5">
+              {block.caption}
+            </figcaption>
+          ) : null}
+        </figure>
+      );
   }
 }
 
@@ -198,6 +218,20 @@ export default function NewsArticleShell({ article }: { article: NewsArticle }) 
             <span>By {article.author}</span>
             <span className="h-1 w-1 rounded-full bg-gold" aria-hidden />
             <time dateTime={article.date}>{article.dateLabel}</time>
+            {article.sourceUrl.includes("x.com/") ||
+            article.sourceUrl.includes("twitter.com/") ? (
+              <>
+                <span className="h-1 w-1 rounded-full bg-gold" aria-hidden />
+                <a
+                  href={article.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-navy transition hover:text-emerald"
+                >
+                  View on X →
+                </a>
+              </>
+            ) : null}
           </div>
 
           {article.blocks.map((block, index) => (
@@ -212,10 +246,10 @@ export default function NewsArticleShell({ article }: { article: NewsArticle }) 
 
           <div className="border-t border-line pt-8">
             <Link
-              href="/"
+              href="/news"
               className="inline-flex text-xs font-semibold uppercase tracking-[0.16em] text-navy transition hover:text-emerald"
             >
-              ← Back to Latest from the Embassy
+              ← Back to Embassy News
             </Link>
           </div>
         </article>

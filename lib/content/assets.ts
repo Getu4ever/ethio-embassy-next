@@ -111,6 +111,24 @@ export const assets = {
     height: 800,
     alt: "Ambassador Biruk Mekonnen presents credentials to IMO",
   },
+  newsEthiopianNewYear: {
+    src: "/images/news/x-posts/new-year-poster.jpg",
+    width: 848,
+    height: 480,
+    alt: "Ambassador Biruk Mekonnen delivers Ethiopian New Year greetings",
+  },
+  newsEthiopianNewYearCard: {
+    src: "/images/news/x-posts/new-year.jpg",
+    width: 890,
+    height: 1600,
+    alt: "Ethiopian New Year greeting card from the Embassy of Ethiopia in London",
+  },
+  newsZamzamAward: {
+    src: "/images/news/x-posts/zamzam-1.jpg",
+    width: 1200,
+    height: 1600,
+    alt: "Ambassador Lalisa Birhanu receives ZamZam Bank Global Islamic Finance Award",
+  },
 } as const;
 
 export type AssetKey = keyof typeof assets;
