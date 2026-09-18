@@ -58,7 +58,7 @@ export type BrandedEmailInput = {
  */
 export function renderBrandedEmail(input: BrandedEmailInput): string {
   const origin = siteOrigin();
-  const logoUrl = `${origin}/images/logo-uk.png`;
+  const logoUrl = `${origin}/images/Embassy-Ethiopia-logo-02.png`;
   const detailsLabel = input.detailsLabel ?? "Details";
   const variant = input.variant ?? "applicant";
 

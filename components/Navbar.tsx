@@ -13,10 +13,11 @@ import {
 import HeaderSearch from "@/components/HeaderSearch";
 import { primaryNav, type NavItem } from "@/lib/content/navigation";
 
-const LOGO_SRC = "/images/logo-uk.png";
-const BUILDING_SRC = "/images/london-ethio-building.jpg";
+const LOGO_SRC = "/images/Embassy-Ethiopia-logo-02.png";
 const WORLD_MAP_SRC = "/images/world-map-header-v2.jpg";
 const ETHIO_UK_SRC = "/images/ethio-uk-modified.png";
+const LOGO_W = 406;
+const LOGO_H = 273;
 
 const menuItems: NavItem[] = primaryNav.filter(
   (item) => item.label !== "Contact Us",
@@ -290,12 +291,12 @@ export default function Navbar() {
         scrolled ? "shadow-[0_12px_40px_rgba(7,21,40,0.35)]" : ""
       }`}
     >
-      {/* Tier 1 — world map brand bar (London photo banner removed) */}
+      {/* Tier 1 — world map brand bar */}
       <div
         className={`relative w-full overflow-hidden bg-[#0B2545] transition-[height] duration-200 ease-out ${
           scrolled
-            ? "h-[5.5rem] sm:h-[6.25rem]"
-            : "h-[8.75rem] sm:h-[9.75rem]"
+            ? "h-[5.25rem] sm:h-[6.5rem] md:h-[7.25rem]"
+            : "h-[6.75rem] sm:h-[9.5rem] md:h-[10.75rem] lg:h-[11.5rem]"
         }`}
       >
         <div className="absolute inset-0">
@@ -304,7 +305,7 @@ export default function Navbar() {
             alt=""
             fill
             priority
-            className="object-cover object-center"
+            className="object-cover object-center brightness-[0.78] contrast-[1.06]"
             sizes="100vw"
           />
           {/* Soft side fades only — keep map clearly visible in the centre */}
@@ -316,64 +317,58 @@ export default function Navbar() {
             className="absolute inset-0 bg-gradient-to-b from-[#0B2545]/25 via-transparent to-[#0B2545]/35"
             aria-hidden
           />
+          {/* Soften the Ethiopia star flare without muting the map lines */}
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 hidden w-[28%] opacity-[0.28] lg:block"
+            className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_48%,rgba(7,21,40,0.42)_0%,rgba(7,21,40,0.18)_28%,transparent_58%)]"
             aria-hidden
+          />
+        </div>
+
+        {/* True-centre wordmark — nudge up on mobile to clear the map star */}
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-[4.75rem] sm:px-28 lg:px-40">
+          <div
+            className={`-translate-y-2 text-center transition-transform duration-200 ease-out sm:translate-y-0 ${
+              scrolled ? "scale-[0.94]" : "scale-100"
+            }`}
           >
-            <Image
-              src={BUILDING_SRC}
-              alt=""
-              fill
-              className="object-contain object-left-bottom"
-              sizes="28vw"
+            <p className="font-display text-[0.68rem] font-semibold leading-tight tracking-[0.12em] text-[#F5E6C8] uppercase sm:text-base sm:tracking-[0.16em] md:text-lg md:tracking-[0.18em] lg:text-xl lg:tracking-[0.2em]">
+              Embassy of Ethiopia
+            </p>
+            <p className="mt-1 font-display text-[0.62rem] font-medium tracking-[0.32em] text-[#dbbf8a] uppercase sm:mt-1.5 sm:text-xs sm:tracking-[0.36em] md:text-sm md:tracking-[0.4em]">
+              London
+            </p>
+            <span
+              className="mx-auto mt-1.5 block h-px w-8 bg-gradient-to-r from-transparent via-[#c5a572] to-transparent sm:mt-2.5 sm:w-16"
+              aria-hidden
             />
           </div>
         </div>
 
-        <div className="relative z-10 flex h-full w-full items-center justify-between gap-3 px-4 py-3 sm:px-8 sm:py-4 lg:px-12">
+        <div className="relative z-20 flex h-full w-full items-center justify-between gap-2 pl-3 pr-5 sm:gap-4 sm:px-8 lg:px-12">
           <Link
             href="/"
-            className={`group flex min-w-0 items-center gap-3 origin-left transition-transform duration-200 ease-out will-change-transform sm:gap-4 ${
-              scrolled ? "scale-[0.94]" : "scale-100"
+            aria-label="Embassy of the Federal Democratic Republic of Ethiopia — London, UK"
+            className={`group relative flex w-[3.4rem] shrink-0 items-center origin-left overflow-hidden transition-transform duration-200 ease-out will-change-transform sm:w-auto sm:overflow-visible ${
+              scrolled ? "scale-[0.96]" : "scale-100"
             }`}
             onClick={closeAll}
           >
-            <span className="relative inline-flex shrink-0">
-              <Image
-                src={LOGO_SRC}
-                alt=""
-                width={270}
-                height={270}
-                priority
-                className={`h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] ${
-                  scrolled
-                    ? "w-12 sm:w-14"
-                    : "w-14 sm:w-16 md:w-[4.25rem]"
-                }`}
-              />
-            </span>
-            <span className="min-w-0 text-left">
-              <span className="block font-display text-[12px] font-semibold leading-tight tracking-[0.08em] text-[#F5E6C8] uppercase sm:text-[14px] md:text-base md:tracking-[0.12em]">
-                Embassy Of Ethiopia
-              </span>
-              <span className="mt-1 flex items-center gap-2 sm:mt-1.5">
-                <span
-                  className="hidden h-px w-6 bg-gradient-to-r from-transparent to-[#c5a572]/80 sm:block"
-                  aria-hidden
-                />
-                <span className="font-display text-[11px] font-medium italic tracking-[0.32em] text-[#dbbf8a] uppercase sm:text-xs md:text-sm md:tracking-[0.4em]">
-                  London
-                </span>
-                <span
-                  className="hidden h-px w-6 bg-gradient-to-l from-transparent to-[#c5a572]/80 sm:block"
-                  aria-hidden
-                />
-              </span>
-            </span>
+            <Image
+              src={LOGO_SRC}
+              alt=""
+              width={LOGO_W}
+              height={LOGO_H}
+              priority
+              className={`w-auto max-w-none object-contain object-left drop-shadow-[0_4px_14px_rgba(0,0,0,0.55)] transition-[height,filter] duration-200 group-hover:brightness-110 ${
+                scrolled
+                  ? "h-[3rem] sm:h-[4.75rem] md:h-[5.5rem]"
+                  : "h-[3.35rem] sm:h-[6.5rem] md:h-[7.75rem] lg:h-[8.5rem]"
+              }`}
+            />
           </Link>
 
           <div
-            className={`relative shrink-0 origin-right transition-transform duration-200 ease-out will-change-transform ${
+            className={`relative shrink-0 origin-right self-center transition-transform duration-200 ease-out will-change-transform ${
               scrolled ? "scale-[0.94]" : "scale-100"
             }`}
           >
@@ -384,8 +379,8 @@ export default function Navbar() {
               height={282}
               className={`h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] ${
                 scrolled
-                  ? "w-12 sm:w-14"
-                  : "w-14 sm:w-16 md:w-[4.25rem]"
+                  ? "w-8 sm:w-12 md:w-14"
+                  : "w-9 sm:w-14 md:w-16 lg:w-[4.5rem]"
               }`}
             />
           </div>

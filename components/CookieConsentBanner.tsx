@@ -81,11 +81,11 @@ export default function CookieConsentBanner() {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:gap-5 sm:px-6 sm:py-3.5 lg:px-8">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-white/15 bg-white/5 sm:h-14 sm:w-14">
             <Image
-              src="/images/logo-uk.png"
+              src="/images/Embassy-Ethiopia-logo-02.png"
               alt="Embassy of Ethiopia"
-              width={48}
-              height={48}
-              className="h-10 w-10 object-contain sm:h-11 sm:w-11"
+              width={406}
+              height={273}
+              className="h-10 w-auto object-contain sm:h-11"
               priority
             />
           </div>
