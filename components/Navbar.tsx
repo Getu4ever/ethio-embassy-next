@@ -190,7 +190,7 @@ function DesktopDropdown({
       <ul
         id={id}
         role="menu"
-        className={`absolute left-0 top-[calc(100%-2px)] z-[60] min-w-[17.5rem] border border-white/10 py-1.5 shadow-xl transition-[opacity,visibility] duration-150 ${
+        className={`absolute left-0 top-[calc(100%-2px)] z-[60] max-h-[min(70vh,28rem)] min-w-[17.5rem] overflow-y-auto overscroll-contain border border-white/10 py-1.5 shadow-xl transition-[opacity,visibility] duration-150 ${
           open
             ? "visible opacity-100"
             : "invisible pointer-events-none opacity-0"
@@ -295,8 +295,8 @@ export default function Navbar() {
       <div
         className={`relative w-full overflow-hidden bg-[#0B2545] transition-[height] duration-200 ease-out ${
           scrolled
-            ? "h-[5.25rem] sm:h-[6.5rem] md:h-[7.25rem]"
-            : "h-[6.75rem] sm:h-[9.5rem] md:h-[10.75rem] lg:h-[11.5rem]"
+            ? "h-[5.25rem] sm:h-[5.75rem] md:h-[6.25rem]"
+            : "h-[6.75rem] sm:h-[8rem] md:h-[8.75rem] lg:h-[9.25rem]"
         }`}
       >
         <div className="absolute inset-0">
@@ -331,10 +331,10 @@ export default function Navbar() {
               scrolled ? "scale-[0.94]" : "scale-100"
             }`}
           >
-            <p className="font-display text-[0.68rem] font-semibold leading-tight tracking-[0.12em] text-[#F5E6C8] uppercase sm:text-base sm:tracking-[0.16em] md:text-lg md:tracking-[0.18em] lg:text-xl lg:tracking-[0.2em]">
+            <p className="font-display text-[0.68rem] font-semibold leading-tight tracking-[0.12em] text-[#F5E6C8] uppercase sm:text-[0.95rem] sm:tracking-[0.16em] md:text-base md:tracking-[0.18em] lg:text-lg lg:tracking-[0.2em]">
               Embassy of Ethiopia
             </p>
-            <p className="mt-1 font-display text-[0.62rem] font-medium tracking-[0.32em] text-[#dbbf8a] uppercase sm:mt-1.5 sm:text-xs sm:tracking-[0.36em] md:text-sm md:tracking-[0.4em]">
+            <p className="mt-1 font-display text-[0.62rem] font-medium tracking-[0.32em] text-[#dbbf8a] uppercase sm:mt-1 sm:text-[0.7rem] sm:tracking-[0.36em] md:text-xs md:tracking-[0.4em]">
               London
             </p>
             <span
@@ -361,8 +361,8 @@ export default function Navbar() {
               priority
               className={`w-auto max-w-none object-contain object-left drop-shadow-[0_4px_14px_rgba(0,0,0,0.55)] transition-[height,filter] duration-200 group-hover:brightness-110 ${
                 scrolled
-                  ? "h-[3rem] sm:h-[4.75rem] md:h-[5.5rem]"
-                  : "h-[3.35rem] sm:h-[6.5rem] md:h-[7.75rem] lg:h-[8.5rem]"
+                  ? "h-[3rem] sm:h-[4rem] md:h-[4.5rem]"
+                  : "h-[3.35rem] sm:h-[5.25rem] md:h-[6rem] lg:h-[6.5rem]"
               }`}
             />
           </Link>
