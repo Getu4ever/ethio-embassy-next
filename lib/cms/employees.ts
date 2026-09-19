@@ -46,9 +46,12 @@ function seedFromDiplomatic(): Employee[] {
 async function readAll(): Promise<Employee[]> {
   try {
     const data = await readOpsJson<Employee[] | null>(BLOB_KEY, null);
-    if (Array.isArray(data) && data.length > 0) return data;
+    if (Array.isArray(data)) return data;
   } catch (error) {
     console.error("[employees:read]", error);
+    throw error instanceof Error
+      ? error
+      : new Error("Could not load employees.");
   }
   const seeded = seedFromDiplomatic();
   try {

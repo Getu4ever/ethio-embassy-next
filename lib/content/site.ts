@@ -94,6 +94,13 @@ export const leadership = [
 
 export type NewsCategory = "News" | "Announcements";
 
+export type NewsImage = {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+};
+
 export type NewsItem = {
   slug: string;
   title: string;
@@ -101,7 +108,7 @@ export type NewsItem = {
   date: string;
   dateLabel: string;
   category: NewsCategory;
-  image: (typeof assets)[keyof typeof assets];
+  image: NewsImage;
   author: string;
 };
 

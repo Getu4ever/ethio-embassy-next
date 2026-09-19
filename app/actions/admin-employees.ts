@@ -7,6 +7,7 @@ import {
   deleteEmployee,
   updateEmployee,
 } from "@/lib/cms/employees";
+import { readImageFile, storePublicImage } from "@/lib/cms/media";
 import { getSessionStaff } from "@/lib/staff/auth";
 import {
   assertPermission,
@@ -20,19 +21,37 @@ async function requireEmployeeManager() {
   return user;
 }
 
+async function resolvePhotoUrl(
+  formData: FormData,
+  fallback = "",
+): Promise<string> {
+  const uploaded = await readImageFile(formData, "photo");
+  if (uploaded) {
+    const stored = await storePublicImage({
+      folder: "employees",
+      fileName: uploaded.fileName,
+      contentType: uploaded.contentType,
+      bytes: uploaded.bytes,
+    });
+    return stored.url;
+  }
+  return String(formData.get("imageSrc") ?? fallback).trim();
+}
+
 export async function adminCreateEmployee(
   _prev: { ok?: boolean; error?: string } | null,
   formData: FormData,
 ) {
   try {
     await requireEmployeeManager();
+    const imageSrc = await resolvePhotoUrl(formData);
     const employee = await createEmployee({
       name: String(formData.get("name") ?? ""),
       role: String(formData.get("role") ?? ""),
       bio: String(formData.get("bio") ?? ""),
       email: String(formData.get("email") ?? ""),
       phone: String(formData.get("phone") ?? ""),
-      imageSrc: String(formData.get("imageSrc") ?? ""),
+      imageSrc,
       imageAlt: String(formData.get("imageAlt") ?? ""),
       published: formData.get("published") === "on",
     });
@@ -49,7 +68,8 @@ export async function adminCreateEmployee(
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message : "Could not create employee.",
+      error:
+        error instanceof Error ? error.message : "Could not create employee.",
     };
   }
 }
@@ -61,13 +81,17 @@ export async function adminUpdateEmployee(
   try {
     await requireEmployeeManager();
     const id = String(formData.get("id") ?? "");
+    const imageSrc = await resolvePhotoUrl(
+      formData,
+      String(formData.get("imageSrc") ?? ""),
+    );
     const employee = await updateEmployee(id, {
       name: String(formData.get("name") ?? ""),
       role: String(formData.get("role") ?? ""),
       bio: String(formData.get("bio") ?? ""),
       email: String(formData.get("email") ?? ""),
       phone: String(formData.get("phone") ?? ""),
-      imageSrc: String(formData.get("imageSrc") ?? ""),
+      imageSrc,
       imageAlt: String(formData.get("imageAlt") ?? ""),
       published: formData.get("published") === "on",
       sortOrder: Number(formData.get("sortOrder") ?? 0),
@@ -85,7 +109,8 @@ export async function adminUpdateEmployee(
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message : "Could not update employee.",
+      error:
+        error instanceof Error ? error.message : "Could not update employee.",
     };
   }
 }

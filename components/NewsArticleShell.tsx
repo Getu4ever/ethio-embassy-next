@@ -86,6 +86,7 @@ function Block({ block }: { block: NewsBlock }) {
           images={block.images.map((image) => ({
             src: image.src,
             alt: image.alt,
+            caption: image.caption,
           }))}
         />
       );
@@ -194,8 +195,14 @@ export function makeNewsMetadata(article: NewsArticle): Metadata {
   };
 }
 
-export default function NewsArticleShell({ article }: { article: NewsArticle }) {
-  const related = getRelatedNews(article.slug);
+export default function NewsArticleShell({
+  article,
+  related,
+}: {
+  article: NewsArticle;
+  related?: NewsArticle[];
+}) {
+  const posts = related ?? getRelatedNews(article.slug);
 
   return (
     <main className="bg-canvas">
@@ -285,7 +292,7 @@ export default function NewsArticleShell({ article }: { article: NewsArticle }) 
         </aside>
       </section>
 
-      <RelatedPosts posts={related} />
+      <RelatedPosts posts={posts} />
     </main>
   );
 }

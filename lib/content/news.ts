@@ -13,7 +13,7 @@ export type NewsBlock =
       /** Full A4 / letter notice — show complete page without cropping */
       presentation?: "photo" | "document";
     }
-  | { type: "gallery"; images: { src: string; alt: string }[] }
+  | { type: "gallery"; images: { src: string; alt: string; caption?: string }[] }
   | {
       type: "video";
       src: string;

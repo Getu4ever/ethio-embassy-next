@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import RecentAdminActivity from "@/components/admin/RecentAdminActivity";
 import { listAuditEntries } from "@/lib/audit/store";
 import { listCases } from "@/lib/cases/store";
@@ -9,6 +10,8 @@ import { WORKFLOW_LIST } from "@/lib/consular/workflows";
 import { listBookingsForRange } from "@/lib/ops/bookings";
 import { BOOKING_SERVICE_LABELS } from "@/lib/booking/types";
 import { formatFeeAmount } from "@/lib/stripe/fees";
+import { canManageNews } from "@/lib/staff/permissions";
+import { requireAdmin } from "@/lib/staff/session";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -17,6 +20,11 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  const viewer = await requireAdmin();
+  if (viewer.role === "editor" && canManageNews(viewer.role)) {
+    redirect("/admin/news");
+  }
+
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
@@ -216,6 +224,11 @@ export default async function AdminDashboardPage() {
           <div className="border border-navy/10 bg-navy p-6 text-white shadow-sm">
             <h2 className="font-display text-xl font-semibold">Quick actions</h2>
             <ul className="mt-4 space-y-2 text-sm text-white/80">
+              <li>
+                <Link href="/admin/news" className="hover:text-gold">
+                  News posts →
+                </Link>
+              </li>
               <li>
                 <Link href="/admin/cases" className="hover:text-gold">
                   Review document cases →

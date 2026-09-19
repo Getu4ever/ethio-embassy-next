@@ -4,7 +4,6 @@ import {
   Noto_Sans_Ethiopic,
   Source_Sans_3,
 } from "next/font/google";
-import Script from "next/script";
 import JsonLd from "@/components/JsonLd";
 import SiteChrome from "@/components/SiteChrome";
 import SitePreloader from "@/components/SitePreloader";
@@ -131,13 +130,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${sans.variable} ${ethiopic.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Inline boot script — avoids next/script beforeInteractive client warning */}
+        <script dangerouslySetInnerHTML={{ __html: preloaderBoot }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans text-charcoal">
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
-        <Script
-          id="preloader-boot"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: preloaderBoot }}
-        />
         <SitePreloader />
         <SiteChrome officeHours={officeHours}>{children}</SiteChrome>
       </body>

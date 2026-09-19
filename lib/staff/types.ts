@@ -13,7 +13,7 @@ export const STAFF_ROLE_LABELS: Record<StaffRole, string> = {
   director: "Director",
   ambassador: "Ambassador",
   consular: "Consular Officer",
-  editor: "Content Editor",
+  editor: "News & Social Editor",
 };
 
 export type StaffUser = {
@@ -27,6 +27,8 @@ export type StaffUser = {
   createdAt: string;
   updatedAt: string;
   createdBy?: string;
+  /** Optional face photo for directors to recognise staff in Admin */
+  photoUrl?: string;
   /** Login accounts never receive automated mail to this address when true */
   suppressOutboundMail?: boolean;
 };

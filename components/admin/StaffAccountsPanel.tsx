@@ -18,6 +18,7 @@ type Account = {
   displayName: string;
   role: StaffRole;
   active: boolean;
+  photoUrl?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -80,7 +81,7 @@ export default function StaffAccountsPanel({
           sent — share passwords through a secure channel only.
         </p>
 
-        <form action={createAction} className="mt-6 grid gap-4 sm:grid-cols-2">
+        <form action={createAction} className="mt-6 grid gap-4 sm:grid-cols-2" encType="multipart/form-data">
           <label className="block text-sm">
             <span className="mb-1.5 block text-white/80">Display name</span>
             <input
@@ -104,7 +105,7 @@ export default function StaffAccountsPanel({
             <span className="mb-1.5 block text-white/80">Role</span>
             <select
               name="role"
-              defaultValue="consular"
+              defaultValue="editor"
               className="w-full border border-white/20 bg-[#0b2545] px-3 py-2.5 text-white outline-none focus:border-gold"
             >
               {STAFF_ROLES.filter((r) => r !== "master").map((role) => (
@@ -123,6 +124,17 @@ export default function StaffAccountsPanel({
               minLength={10}
               className="w-full border border-white/20 bg-white/10 px-3 py-2.5 text-white outline-none placeholder:text-white/40 focus:border-gold"
               placeholder="Min. 10 characters"
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="mb-1.5 block text-white/80">
+              Photo (for directors to recognise them)
+            </span>
+            <input
+              type="file"
+              name="photo"
+              accept="image/*"
+              className="w-full border border-white/20 bg-white/10 px-3 py-2.5 text-sm text-white file:mr-3 file:border-0 file:bg-gold file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:tracking-[0.1em] file:text-navy-deep"
             />
           </label>
           <div className="sm:col-span-2">
@@ -172,14 +184,30 @@ function StaffEditRow({ account }: { account: Account }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="font-display text-lg font-semibold text-navy">
-            {account.displayName}
-          </p>
-          <p className="text-sm text-muted">
-            {STAFF_ROLE_LABELS[account.role]}
-            {isMaster ? " · protected" : ""}
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-canvas ring-2 ring-gold/40">
+            {account.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={account.photoUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-navy">
+                {account.displayName.slice(0, 1).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div>
+            <p className="font-display text-lg font-semibold text-navy">
+              {account.displayName}
+            </p>
+            <p className="text-sm text-muted">
+              {STAFF_ROLE_LABELS[account.role]}
+              {isMaster ? " · protected" : ""}
+            </p>
+          </div>
         </div>
         {!isMaster ? (
           <form action={adminDeleteStaffAccount}>
@@ -199,7 +227,7 @@ function StaffEditRow({ account }: { account: Account }) {
         ) : null}
       </div>
 
-      <form action={action} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <form action={action} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" encType="multipart/form-data">
         <input type="hidden" name="id" value={account.id} />
         <label className="block text-sm sm:col-span-1">
           <span className="mb-1 block text-muted">Name</span>
@@ -263,6 +291,15 @@ function StaffEditRow({ account }: { account: Account }) {
             minLength={10}
             placeholder="New password"
             className="w-full border border-line px-3 py-2 outline-none focus:border-navy"
+          />
+        </label>
+        <label className="block text-sm sm:col-span-2">
+          <span className="mb-1 block text-muted">Update photo</span>
+          <input
+            type="file"
+            name="photo"
+            accept="image/*"
+            className="w-full border border-line bg-white px-3 py-2 text-sm file:mr-3 file:border-0 file:bg-navy file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:tracking-[0.1em] file:text-white"
           />
         </label>
         <div className="flex items-end sm:col-span-2">

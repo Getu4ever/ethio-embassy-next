@@ -37,6 +37,9 @@ yarn-error.log*
 # local consular case store (dev fallback when Blob is unset)
 .data/
 
+# local CMS media uploads (dev fallback when Blob is unset)
+/public/uploads/
+
 # vercel
 .vercel
 

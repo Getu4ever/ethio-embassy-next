@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type Slide = {
@@ -38,6 +37,15 @@ export default function NewsImageCarousel({
   };
 
   const slide = images[index]!;
+  const caption = (() => {
+    const explicit = slide.caption?.trim();
+    if (explicit) return explicit;
+    const alt = slide.alt?.trim() || "";
+    if (!alt || /^embassy photograph$/i.test(alt)) return "";
+    if (/\.(jpe?g|png|webp|gif|heic)$/i.test(alt)) return "";
+    if (/^(img|dsc|photo|image|screenshot)[\s_-]?\d+/i.test(alt)) return "";
+    return alt;
+  })();
 
   return (
     <div className="overflow-hidden border border-line bg-white shadow-[0_18px_40px_rgba(11,37,69,0.08)]">
@@ -72,38 +80,28 @@ export default function NewsImageCarousel({
         ) : null}
       </div>
 
-      <div className="relative aspect-[16/10] overflow-hidden bg-navy sm:aspect-[16/9]">
-        {images.map((image, i) => {
-          const active = i === index;
-          return (
-            <div
-              key={image.src}
-              className={`absolute inset-0 transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
-                active
-                  ? "z-[1] scale-100 opacity-100"
-                  : "z-0 scale-[1.03] opacity-0"
-              }`}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                priority={i === 0}
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 720px"
-              />
-            </div>
-          );
-        })}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy-deep/55 via-transparent to-transparent" />
-        {slide.caption || slide.alt ? (
-          <div className="absolute inset-x-0 bottom-0 z-[2] p-4 sm:p-5">
-            <p className="max-w-xl text-sm leading-relaxed text-white/90">
-              {slide.caption || slide.alt}
-            </p>
+      {/* Frame hugs the photo — no fixed min-height letterbox */}
+      <figure className="m-0 bg-[#eef1f5]">
+        {images.map((image, i) => (
+          <div
+            key={image.src}
+            className={i === index ? "block" : "hidden"}
+            aria-hidden={i !== index}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={image.src}
+              alt={image.alt}
+              className="mx-auto block h-auto max-h-[min(75vh,44rem)] w-auto max-w-full"
+            />
           </div>
+        ))}
+        {caption ? (
+          <figcaption className="border-t border-line bg-white px-4 py-3 text-sm leading-relaxed text-muted sm:px-5">
+            {caption}
+          </figcaption>
         ) : null}
-      </div>
+      </figure>
 
       {images.length > 1 ? (
         <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-3 sm:px-5">

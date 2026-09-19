@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { newsItems } from "@/lib/content/site";
+import { useEffect, useMemo, useState } from "react";
+import type { NewsItem } from "@/lib/content/site";
 
 const PREFERRED_FIRST = "ambassador-credentials-imo";
 
@@ -14,29 +14,39 @@ const CAROUSEL_EXCLUDED = new Set([
   "zamzam-bank-islamic-finance-award",
 ]);
 
-const slides = [
-  ...newsItems.filter((item) => item.slug === PREFERRED_FIRST),
-  ...newsItems.filter(
-    (item) =>
-      item.slug !== PREFERRED_FIRST && !CAROUSEL_EXCLUDED.has(item.slug),
-  ),
-];
-
 const INTERVAL_MS = 7000;
 
-export default function NewsCarousel() {
+export default function NewsCarousel({ items }: { items: NewsItem[] }) {
+  const slides = useMemo(() => {
+    const preferred = items.filter((item) => item.slug === PREFERRED_FIRST);
+    const rest = items.filter(
+      (item) =>
+        item.slug !== PREFERRED_FIRST && !CAROUSEL_EXCLUDED.has(item.slug),
+    );
+    return [...preferred, ...rest];
+  }, [items]);
+
   const [index, setIndex] = useState(0);
   const [progressKey, setProgressKey] = useState(0);
 
   useEffect(() => {
+    if (slides.length === 0) return;
     const id = window.setInterval(() => {
       setIndex((current) => (current + 1) % slides.length);
       setProgressKey((k) => k + 1);
     }, INTERVAL_MS);
     return () => window.clearInterval(id);
-  }, [index]);
+  }, [index, slides.length]);
 
-  const slide = slides[index];
+  if (slides.length === 0) {
+    return (
+      <div className="relative flex h-full min-h-[280px] items-center justify-center bg-navy text-sm text-white/70 sm:min-h-[360px] lg:min-h-[420px]">
+        News coming soon
+      </div>
+    );
+  }
+
+  const slide = slides[index]!;
   const go = (next: number) => {
     setIndex((current) => (current + next + slides.length) % slides.length);
     setProgressKey((k) => k + 1);
@@ -88,7 +98,10 @@ export default function NewsCarousel() {
       </button>
 
       <div className="absolute inset-x-0 bottom-0 z-10 px-3 pb-3 pt-16 sm:px-5 sm:pb-4">
-        <div key={slide.slug} className="carousel-caption bg-black/50 px-3 py-3 backdrop-blur-[2px] sm:px-4 sm:py-4">
+        <div
+          key={slide.slug}
+          className="carousel-caption bg-black/50 px-3 py-3 backdrop-blur-[2px] sm:px-4 sm:py-4"
+        >
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">
             {slide.dateLabel}
           </p>

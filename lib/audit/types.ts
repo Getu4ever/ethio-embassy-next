@@ -6,7 +6,8 @@ export type AuditModule =
   | "auth"
   | "system"
   | "content"
-  | "employees";
+  | "employees"
+  | "news";
 
 export type AuditAction =
   | "case.approve"
@@ -29,6 +30,9 @@ export type AuditAction =
   | "employee.create"
   | "employee.update"
   | "employee.delete"
+  | "news.create"
+  | "news.update"
+  | "news.delete"
   | "system.note";
 
 export type AuditEntry = {

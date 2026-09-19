@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import NewsCarousel from "@/components/home/NewsCarousel";
+import { listNewsPosts, toNewsArticle } from "@/lib/cms/news";
 import { assets } from "@/lib/content/assets";
 import {
   ambassadorWelcome,
   leadership,
-  latestTicker,
-  newsItems,
   site,
 } from "@/lib/content/site";
 import { governmentOnlineServices } from "@/lib/content/navigation";
@@ -43,12 +42,16 @@ const consularActions = [
 ] as const;
 
 /** Top of homepage — news carousel + distinctive ambassador welcome card */
-export function HomeTop() {
+export async function HomeTop() {
+  const newsItems = (await listNewsPosts({ publishedOnly: true })).map(
+    toNewsArticle,
+  );
+
   return (
     <section className="bg-canvas">
       <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-12 lg:gap-6 lg:px-8 lg:py-10">
         <div className="lg:col-span-8">
-          <NewsCarousel />
+          <NewsCarousel items={newsItems} />
         </div>
         <aside className="relative flex min-h-[280px] flex-col overflow-hidden lg:col-span-4 lg:min-h-[420px]">
           {/* Flag accent */}
@@ -202,7 +205,17 @@ export function LeadershipSection() {
   );
 }
 
-export function NewsSection() {
+export async function NewsSection() {
+  const newsItems = (await listNewsPosts({ publishedOnly: true })).map(
+    toNewsArticle,
+  );
+  if (newsItems.length === 0) return null;
+  const featured = newsItems[0]!;
+  const ticker = newsItems
+    .slice(0, 3)
+    .map((item) => item.title)
+    .join(" · ");
+
   return (
     <section
       id="news"
@@ -218,22 +231,22 @@ export function NewsSection() {
           </h2>
         </div>
         <div className="hidden max-w-md text-sm text-muted sm:line-clamp-2 md:block">
-          {latestTicker.map((item) => item.title).join(" · ")}
+          {ticker}
         </div>
       </div>
 
       <div className="mt-8 grid gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-12">
         <Link
-          href={`/news/${newsItems[0].slug}`}
+          href={`/news/${featured.slug}`}
           className="group relative min-h-[22rem] overflow-hidden bg-navy sm:min-h-[28rem] lg:col-span-7"
         >
           <Image
             src={
-              newsItems[0].slug === "zamzam-bank-islamic-finance-award"
+              featured.slug === "zamzam-bank-islamic-finance-award"
                 ? "/images/news/x-posts/zamzam-1-featured.jpg"
-                : newsItems[0].image.src
+                : featured.image.src
             }
-            alt={newsItems[0].image.alt}
+            alt={featured.image.alt}
             fill
             className="object-cover object-center transition duration-700 group-hover:scale-105"
             sizes="(max-width: 1024px) 100vw, 58vw"
@@ -241,13 +254,13 @@ export function NewsSection() {
           <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy/40 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
-              {newsItems[0].category} · {newsItems[0].dateLabel}
+              {featured.category} · {featured.dateLabel}
             </span>
             <h3 className="mt-3 font-display text-xl font-semibold text-white sm:text-2xl md:text-3xl">
-              {newsItems[0].title}
+              {featured.title}
             </h3>
             <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/75">
-              {newsItems[0].excerpt}
+              {featured.excerpt}
             </p>
           </div>
         </Link>

@@ -12,7 +12,17 @@ export function canManageEmployees(role: StaffRole): boolean {
   );
 }
 
+/** Fees, hours, and site notes — not news posts. */
 export function canManageContent(role: StaffRole): boolean {
+  return (
+    role === "master" ||
+    role === "director" ||
+    role === "ambassador"
+  );
+}
+
+/** Website news / social posts. */
+export function canManageNews(role: StaffRole): boolean {
   return (
     role === "master" ||
     role === "director" ||

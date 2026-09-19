@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { recordStaffAudit } from "@/lib/audit/record";
+import { readImageFile, storePublicImage } from "@/lib/cms/media";
 import {
   assertPermission,
   canManageStaff,
@@ -39,7 +40,7 @@ export async function adminListStaffAccounts() {
 }
 
 export async function adminCreateStaffAccount(
-  _prev: { ok?: boolean; error?: string; tempPassword?: string } | null,
+  _prev: { ok?: boolean; error?: string; tempPassword?: string; message?: string } | null,
   formData: FormData,
 ) {
   try {
@@ -56,6 +57,18 @@ export async function adminCreateStaffAccount(
       password,
       createdBy: actor.email,
     });
+
+    const photo = await readImageFile(formData, "photo");
+    if (photo) {
+      const stored = await storePublicImage({
+        folder: "staff",
+        fileName: photo.fileName,
+        contentType: photo.contentType,
+        bytes: photo.bytes,
+      });
+      await updateStaffUser(created.id, { photoUrl: stored.url });
+    }
+
     await recordStaffAudit({
       action: "staff.create",
       module: "staff",
@@ -89,12 +102,25 @@ export async function adminUpdateStaffAccount(
     const active = String(formData.get("active") ?? "true") === "true";
     const role = roleRaw as StaffRole;
 
+    const photo = await readImageFile(formData, "photo");
+    let photoUrl: string | undefined;
+    if (photo) {
+      const stored = await storePublicImage({
+        folder: "staff",
+        fileName: photo.fileName,
+        contentType: photo.contentType,
+        bytes: photo.bytes,
+      });
+      photoUrl = stored.url;
+    }
+
     const updated = await updateStaffUser(id, {
       displayName: String(formData.get("displayName") ?? ""),
       email: String(formData.get("email") ?? ""),
       role: STAFF_ROLES.includes(role) ? role : undefined,
       active,
       password: password || undefined,
+      photoUrl,
     });
 
     await recordStaffAudit({

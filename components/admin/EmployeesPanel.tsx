@@ -31,7 +31,7 @@ export default function EmployeesPanel({
           <p className="mt-1 text-sm text-muted">
             Profiles can appear on About Us when published.
           </p>
-          <form action={createAction} className="mt-5 grid gap-4 sm:grid-cols-2">
+          <form action={createAction} className="mt-5 grid gap-4 sm:grid-cols-2" encType="multipart/form-data">
             <Field name="name" label="Full name" required />
             <Field name="role" label="Role / title" required />
             <Field name="email" label="Email" type="email" />
@@ -45,12 +45,19 @@ export default function EmployeesPanel({
                 placeholder="Short professional biography"
               />
             </label>
-            <Field
-              name="imageSrc"
-              label="Image path"
-              placeholder="/images/about-us/…"
-            />
-            <Field name="imageAlt" label="Image alt text" />
+            <label className="block text-sm">
+              <span className="mb-1.5 block font-medium text-charcoal">
+                Profile photo
+              </span>
+              <input
+                type="file"
+                name="photo"
+                accept="image/*"
+                className="w-full border border-line bg-white px-3 py-2.5 text-sm file:mr-3 file:border-0 file:bg-navy file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:tracking-[0.1em] file:text-white"
+              />
+            </label>
+            <Field name="imageAlt" label="Photo alt text" />
+            <input type="hidden" name="imageSrc" value="" />
             <label className="flex items-center gap-2 text-sm sm:col-span-2">
               <input type="checkbox" name="published" defaultChecked className="accent-navy" />
               Published on public site
@@ -115,7 +122,7 @@ function EmployeeCard({
         </div>
         <div className="min-w-0 flex-1">
           {canEdit ? (
-            <form action={action} className="grid gap-3 sm:grid-cols-2">
+            <form action={action} className="grid gap-3 sm:grid-cols-2" encType="multipart/form-data">
               <input type="hidden" name="id" value={employee.id} />
               <input type="hidden" name="sortOrder" value={employee.sortOrder} />
               <Field name="name" label="Name" defaultValue={employee.name} required />
@@ -131,16 +138,23 @@ function EmployeeCard({
                   className="w-full border border-line px-3 py-2.5 outline-none focus:border-navy"
                 />
               </label>
-              <Field
-                name="imageSrc"
-                label="Image path"
-                defaultValue={employee.imageSrc}
-              />
+              <label className="block text-sm">
+                <span className="mb-1.5 block font-medium text-charcoal">
+                  Replace photo
+                </span>
+                <input
+                  type="file"
+                  name="photo"
+                  accept="image/*"
+                  className="w-full border border-line bg-white px-3 py-2.5 text-sm file:mr-3 file:border-0 file:bg-navy file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:tracking-[0.1em] file:text-white"
+                />
+              </label>
               <Field
                 name="imageAlt"
-                label="Image alt"
+                label="Photo alt"
                 defaultValue={employee.imageAlt}
               />
+              <input type="hidden" name="imageSrc" value={employee.imageSrc} />
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"

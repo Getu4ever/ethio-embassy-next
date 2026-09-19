@@ -3,12 +3,16 @@ import NewsArticleShell, {
   makeNewsMetadata,
 } from "@/components/NewsArticleShell";
 import {
-  getAllNewsSlugs,
-  getNewsArticle,
-} from "@/lib/content/news";
+  getNewsPostBySlug,
+  listNewsPosts,
+  toNewsArticle,
+} from "@/lib/cms/news";
 
-export function generateStaticParams() {
-  return getAllNewsSlugs().map((slug) => ({ slug }));
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  const posts = await listNewsPosts({ publishedOnly: true });
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({
@@ -17,9 +21,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getNewsArticle(slug);
-  if (!article) return { title: "News" };
-  return makeNewsMetadata(article);
+  const post = await getNewsPostBySlug(slug, { publishedOnly: true });
+  if (!post) return { title: "News" };
+  return makeNewsMetadata(toNewsArticle(post));
 }
 
 export default async function NewsArticlePage({
@@ -28,7 +32,12 @@ export default async function NewsArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getNewsArticle(slug);
-  if (!article) notFound();
-  return <NewsArticleShell article={article} />;
+  const post = await getNewsPostBySlug(slug, { publishedOnly: true });
+  if (!post) notFound();
+  const article = toNewsArticle(post);
+  const related = (await listNewsPosts({ publishedOnly: true }))
+    .filter((item) => item.slug !== slug)
+    .slice(0, 3)
+    .map(toNewsArticle);
+  return <NewsArticleShell article={article} related={related} />;
 }

@@ -11,6 +11,8 @@ import {
 import JsonLd from "@/components/JsonLd";
 import { faqPageJsonLd } from "@/lib/seo/structured-data";
 
+export const dynamic = "force-dynamic";
+
 export default function HomePage() {
   return (
     <>

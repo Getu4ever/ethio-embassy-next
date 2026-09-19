@@ -162,7 +162,7 @@ export async function createStaffUser(input: {
 export async function updateStaffUser(
   id: string,
   patch: Partial<
-    Pick<StaffUser, "displayName" | "role" | "active" | "email">
+    Pick<StaffUser, "displayName" | "role" | "active" | "email" | "photoUrl">
   > & { password?: string },
 ): Promise<StaffUser> {
   const users = await ensureStaffUsers();
@@ -209,6 +209,9 @@ export async function updateStaffUser(
     }
     current.passwordHash = hashPassword(patch.password);
   }
+  if (patch.photoUrl !== undefined) {
+    current.photoUrl = patch.photoUrl.trim() || undefined;
+  }
   current.updatedAt = new Date().toISOString();
   users[idx] = current;
   await writeUsers(users);
@@ -233,6 +236,7 @@ export function toPublicStaff(user: StaffUser) {
     displayName: user.displayName,
     role: user.role,
     active: user.active,
+    photoUrl: user.photoUrl ?? "",
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };

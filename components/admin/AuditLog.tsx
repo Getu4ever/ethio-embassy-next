@@ -21,6 +21,9 @@ const ACTION_LABELS: Record<AuditEntry["action"], string> = {
   "employee.create": "Add employee",
   "employee.update": "Update employee",
   "employee.delete": "Delete employee",
+  "news.create": "Create news post",
+  "news.update": "Update news post",
+  "news.delete": "Delete news post",
   "system.note": "System note",
 };
 

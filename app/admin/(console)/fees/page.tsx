@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import SiteContentEditor from "@/components/admin/SiteContentEditor";
 import {
   getResolvedFees,
@@ -15,6 +16,9 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminFeesPage() {
   const viewer = await requireAdmin();
+  if (!canManageContent(viewer.role)) {
+    redirect(viewer.role === "editor" ? "/admin/news" : "/admin");
+  }
   const [content, feesMap] = await Promise.all([
     getSiteContent(),
     getResolvedFees(),
