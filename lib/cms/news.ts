@@ -4,6 +4,7 @@ import type { NewsCategory } from "@/lib/content/site";
 import {
   embassyTodayDate,
   paragraphsToBlocks,
+  videoBlockFromEmbedUrl,
   type ManagedNewsPost,
 } from "@/lib/cms/news-shared";
 import { readOpsJson, writeOpsJson } from "@/lib/ops/json-store";
@@ -13,7 +14,10 @@ export {
   blocksToParagraphText,
   embassyTodayDate,
   paragraphsToBlocks,
+  parseVideoEmbedUrl,
   toNewsArticle,
+  videoBlockFromEmbedUrl,
+  videoEmbedFromPost,
 } from "@/lib/cms/news-shared";
 
 const BLOB_KEY = "ops/news-posts.json";
@@ -131,6 +135,9 @@ export async function createNewsPost(input: {
   imageSrc: string;
   imageAlt?: string;
   galleryImages?: { src: string; alt: string; caption?: string }[];
+  /** Optional YouTube / Facebook video to embed under the story */
+  videoEmbedUrl?: string;
+  videoCaption?: string;
   published?: boolean;
 }): Promise<ManagedNewsPost> {
   const all = await readAll();
@@ -159,6 +166,11 @@ export async function createNewsPost(input: {
       images: input.galleryImages,
     });
   }
+  const videoBlock = videoBlockFromEmbedUrl(
+    input.videoEmbedUrl ?? "",
+    input.videoCaption,
+  );
+  if (videoBlock) blocks.push(videoBlock);
 
   const post: ManagedNewsPost = {
     id: createId(),
@@ -204,6 +216,9 @@ export async function updateNewsPost(
     imageAlt?: string;
     /** When provided (even empty), replaces the gallery. Omit to leave unchanged. */
     galleryImages?: { src: string; alt: string; caption?: string }[];
+    /** When provided (even empty), replaces social video embeds. Omit to leave unchanged. */
+    videoEmbedUrl?: string;
+    videoCaption?: string;
     published?: boolean;
   },
 ): Promise<ManagedNewsPost> {
@@ -229,7 +244,16 @@ export async function updateNewsPost(
     input.excerpt.trim() || current.excerpt || lede.slice(0, 180);
   const imageSrc = input.imageSrc?.trim() || current.image.src;
 
-  const preservedVideo = current.blocks.filter((block) => block.type === "video");
+  const preservedFileVideos = current.blocks.filter(
+    (block) =>
+      block.type === "video" &&
+      (!block.provider || block.provider === "file"),
+  );
+  const preservedSocialVideos = current.blocks.filter(
+    (block) =>
+      block.type === "video" &&
+      (block.provider === "youtube" || block.provider === "facebook"),
+  );
   const blocks: NewsBlock[] = [...paragraphs];
   if (input.galleryImages) {
     if (input.galleryImages.length > 0) {
@@ -243,7 +267,16 @@ export async function updateNewsPost(
   for (const block of current.blocks) {
     if (block.type === "image") blocks.push(block);
   }
-  blocks.push(...preservedVideo);
+  blocks.push(...preservedFileVideos);
+  if (input.videoEmbedUrl !== undefined) {
+    const videoBlock = videoBlockFromEmbedUrl(
+      input.videoEmbedUrl,
+      input.videoCaption,
+    );
+    if (videoBlock) blocks.push(videoBlock);
+  } else {
+    blocks.push(...preservedSocialVideos);
+  }
 
   all[idx] = {
     ...current,

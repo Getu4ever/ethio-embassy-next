@@ -19,6 +19,8 @@ import {
 import {
   blocksToParagraphText,
   embassyTodayDate,
+  parseVideoEmbedUrl,
+  videoEmbedFromPost,
   type ManagedNewsPost,
 } from "@/lib/cms/news-shared";
 
@@ -318,12 +320,31 @@ function NewsDeskComposer({
   const [galleryItems, setGalleryItems] = useState<GalleryEditorItem[]>(() =>
     galleryItemsFromPost(post),
   );
+  const initialVideo = videoEmbedFromPost(post);
+  const [videoUrl, setVideoUrl] = useState(initialVideo.url);
+  const [videoCaption, setVideoCaption] = useState(initialVideo.caption);
   const handledSuccess = useRef<string | null>(null);
   const onSavedRef = useRef(onSaved);
   onSavedRef.current = onSaved;
   const coverInputRef = useRef<HTMLInputElement | null>(null);
   const coverSectionRef = useRef<HTMLDivElement | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
+
+  const videoParse = useMemo(() => {
+    const trimmed = videoUrl.trim();
+    if (!trimmed) return { status: "empty" as const };
+    try {
+      const parsed = parseVideoEmbedUrl(trimmed);
+      if (!parsed) return { status: "empty" as const };
+      return { status: "ok" as const, parsed };
+    } catch (error) {
+      return {
+        status: "error" as const,
+        message:
+          error instanceof Error ? error.message : "Unsupported video link.",
+      };
+    }
+  }, [videoUrl]);
 
   function pickCoverPhoto() {
     coverInputRef.current?.click();
@@ -372,6 +393,8 @@ function NewsDeskComposer({
     formData.delete("galleryImages");
     formData.delete("galleryCaptions");
     formData.delete("existingGallery");
+    formData.set("videoEmbedUrl", videoUrl.trim());
+    formData.set("videoCaption", videoCaption.trim());
 
     const existing = galleryItems
       .filter((item) => item.src && !item.file)
@@ -417,6 +440,8 @@ function NewsDeskComposer({
         }
         return [];
       });
+      setVideoUrl("");
+      setVideoCaption("");
       if (coverInputRef.current) coverInputRef.current.value = "";
       if (galleryInputRef.current) galleryInputRef.current.value = "";
     }
@@ -717,6 +742,50 @@ function NewsDeskComposer({
             ) : null}
           </div>
 
+          <div>
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
+              Embed video{" "}
+              <span className="font-normal normal-case tracking-normal text-muted/80">
+                (optional)
+              </span>
+            </label>
+            <input
+              type="url"
+              value={videoUrl}
+              onChange={(event) => setVideoUrl(event.target.value)}
+              placeholder="https://www.youtube.com/watch?v=… or Facebook reel / video"
+              className="w-full border border-line bg-white px-3 py-2.5 text-sm outline-none focus:border-navy"
+            />
+            <p className="mt-1.5 text-xs text-muted">
+              Paste a YouTube or Facebook video link. Leave blank for no embed.
+            </p>
+            {videoParse.status === "ok" ? (
+              <p className="mt-2 text-xs font-medium text-emerald">
+                Recognised as {videoParse.parsed.label} — will appear under the
+                story.
+              </p>
+            ) : null}
+            {videoParse.status === "error" ? (
+              <p className="mt-2 text-xs text-crimson" role="alert">
+                {videoParse.message}
+              </p>
+            ) : null}
+            {videoUrl.trim() ? (
+              <label className="mt-3 block text-sm">
+                <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">
+                  Video caption
+                </span>
+                <input
+                  type="text"
+                  value={videoCaption}
+                  onChange={(event) => setVideoCaption(event.target.value)}
+                  placeholder="Optional — e.g. Embassy briefing highlights"
+                  className="w-full border border-line bg-[#fbfcfd] px-3 py-2 outline-none focus:border-navy focus:bg-white"
+                />
+              </label>
+            ) : null}
+          </div>
+
           <button
             type="button"
             onClick={() => setShowMeta((value) => !value)}
@@ -809,6 +878,17 @@ function NewsDeskComposer({
               {body.split(/\n\s*\n/).filter((p) => p.trim()).length > 3 ? (
                 <p className="text-xs text-muted">…continues on the full page</p>
               ) : null}
+              {videoParse.status === "ok" ? (
+                <div className="border border-dashed border-navy/20 bg-[#f8fafc] px-3 py-4 text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
+                    {videoParse.parsed.label} embed
+                  </p>
+                  <p className="mt-1.5 text-xs text-muted">
+                    {videoCaption.trim() ||
+                      "Video plays on the published article page."}
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -877,7 +957,7 @@ function NewsDeskComposer({
                 type="submit"
                 name="intent"
                 value="publish"
-                disabled={pending}
+                disabled={pending || videoParse.status === "error"}
                 className="bg-navy px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-white hover:bg-navy-mid disabled:opacity-60"
               >
                 {pending
@@ -890,7 +970,7 @@ function NewsDeskComposer({
                 type="submit"
                 name="intent"
                 value="draft"
-                disabled={pending}
+                disabled={pending || videoParse.status === "error"}
                 className="border border-navy/25 bg-white px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-navy disabled:opacity-60"
               >
                 {pending ? "Saving…" : "Hold as draft"}

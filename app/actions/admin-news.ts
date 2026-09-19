@@ -165,6 +165,8 @@ export async function adminCreateNewsPost(
       imageSrc,
       imageAlt: String(formData.get("imageAlt") ?? "") || title,
       galleryImages: galleryImages.length > 0 ? galleryImages : undefined,
+      videoEmbedUrl: String(formData.get("videoEmbedUrl") ?? ""),
+      videoCaption: String(formData.get("videoCaption") ?? ""),
       published,
     });
 
@@ -233,6 +235,8 @@ export async function adminUpdateNewsPost(
       imageSrc: imageSrc || undefined,
       imageAlt: String(formData.get("imageAlt") ?? "") || title,
       galleryImages,
+      videoEmbedUrl: String(formData.get("videoEmbedUrl") ?? ""),
+      videoCaption: String(formData.get("videoCaption") ?? ""),
       published,
     });
 

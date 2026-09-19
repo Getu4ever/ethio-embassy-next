@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import FacebookVideoEmbed from "@/components/FacebookVideoEmbed";
 import NewsImageCarousel from "@/components/NewsImageCarousel";
 import NewsShareBar from "@/components/NewsShareBar";
+import YouTubeVideoEmbed from "@/components/YouTubeVideoEmbed";
 import {
   getRelatedNews,
   type NewsArticle,
@@ -93,6 +94,15 @@ function Block({ block }: { block: NewsBlock }) {
     case "video":
       if (block.provider === "facebook") {
         return <FacebookVideoEmbed url={block.src} caption={block.caption} />;
+      }
+      if (block.provider === "youtube") {
+        return (
+          <YouTubeVideoEmbed
+            src={block.src}
+            caption={block.caption}
+            externalUrl={block.externalUrl}
+          />
+        );
       }
       return (
         <figure className="overflow-hidden border border-line bg-navy">

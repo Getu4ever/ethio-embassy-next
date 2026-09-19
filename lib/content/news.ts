@@ -19,9 +19,9 @@ export type NewsBlock =
       src: string;
       poster?: string;
       caption?: string;
-      /** Hosted file by default; facebook uses an embed iframe */
-      provider?: "file" | "facebook";
-      /** Optional outbound link (e.g. original Facebook reel) */
+      /** Hosted file by default; facebook / youtube use an embed iframe */
+      provider?: "file" | "facebook" | "youtube";
+      /** Optional outbound link (e.g. original Facebook reel / YouTube watch page) */
       externalUrl?: string;
       externalLabel?: string;
     };
